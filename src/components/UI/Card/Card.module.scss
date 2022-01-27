@@ -1,0 +1,44 @@
+$card-min-width: clamp(90rem, 50vw, 200rem);
+
+.card{
+    width: $card-min-width;
+    border-radius: 2rem;
+    background-repeat: no-repeat;
+    background-size: cover;
+    display: grid;
+    padding: 3% 5%;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    grid-template-areas: ". like"
+               "title rating";
+    color: white;
+    font-size: 3rem;
+
+    >{
+        filter: drop-shadow(1px, 1px, 3px, black);
+    }
+
+    .title{
+        grid-area: title;
+        align-self: end;
+    }
+
+    .like{
+        grid-area: like;
+        justify-self: end;
+    }
+
+    // .
+
+    .rating{
+        grid-area: rating;
+        align-self: end;
+        justify-self: end;
+    }
+
+    &:after{
+        display: block;
+        content: "";
+        padding-top: 100% * (9 / 16);
+    }
+}
