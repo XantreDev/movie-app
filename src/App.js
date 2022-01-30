@@ -4,32 +4,24 @@ import CardsList from "./components/CardsList/CardsList";
 import { DataService } from "./DataService/DataService";
 
 function App() {
-    const [slides, setSlides] = useState([]);
 
-    const [loadedMovies, setLoadedMovies] = useState([]);
-    const [movieIndex, setMovieIndex] = useState(0);
+    // useEffect(_ => {
 
-    useEffect((_) => reciveMovies(), []);
+    //     const forbidWheelClick = click => {
+    //         if (click.which === 1){
+    //             click.stopPropagation()
+    //             click.preventDefault()
+    //         }
+    //     }
 
-    const reciveMovies = async () => {
-        const moviesList = await DataService.getTrendingMovies();
-        setLoadedMovies(moviesList);
-        setSlides(moviesList.slice(0, 5));
-    };
+    //     window.addEventListener('auxclick', forbidWheelClick)
 
-    const fetchSlides = (event) => {};
+    //     return _ => window.removeEventListener('auxclick', forbidWheelClick)
+    // })
 
     return (
         <div className="App">
-            {loadedMovies.length !== 0 ? (
-                <CardsList>
-                    {slides.map((slide) => (
-                        <Card {...slide} />
-                    ))}
-                </CardsList>
-            ) : (
-                <h1>Loading</h1>
-            )}
+            <CardsList/>
         </div>
     );
 }
