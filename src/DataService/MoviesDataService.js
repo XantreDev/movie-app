@@ -1,32 +1,23 @@
 import axios from "axios";
+import { generateBaseRequest } from "../utils/utils";
 
 let lastDiscoverPage = 1;
-export class DataService {
+export class MoviesDataService {
     static apiKey =
         "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJjYTFkYzVkNjU0M2E5YzgzM2IxNDNhODc5MGVlOTk5NSIsInN1YiI6IjYxZjJlODA2OWEzYzQ5MDA0NDY5NDU4NCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.ZFB-6d11GjxbaPcH9IsJiTHo4e2IxxNspyF0MmDYpJU";
-    static baseUrl = "https://api.themoviedb.org/3";
+    static apiUrl = "https://api.themoviedb.org/3";
     static imageUrl = "https://image.tmdb.org/t/p/original";
 
-    static setupAxios() {
-        axios.defaults.headers.common = {
-            Authorization: `Bearer ${this.apiKey}`,
-        };
-        axios.defaults.baseURL = this.baseUrl;
-    }
+    static baseMovieRequest = generateBaseRequest(this.apiUrl, this.apiKey)
 
     static async getTrendingMovies() {
         const contentType = "movies";
         const timeWindow = "week";
 
-        try {
-            var response = await axios({
-                method: "get",
-                url: `/trending/${contentType}/${timeWindow}`,
-            });
-        } catch (error) {
-            console.log(error);
-            return {};
-        }
+        var response = await axios({
+            method: "get",
+            url: `/trending/${contentType}/${timeWindow}`,
+        });
 
         const moviesObject = this.responseToMoviesObject(response);
         return moviesObject;
@@ -35,6 +26,7 @@ export class DataService {
     static responseToMoviesObject(response) {
         return response.data.results.map((movie) => {
             return {
+                id: movie.id,
                 title: movie.title,
                 overview: movie.overview,
                 image: this.chooseImage(movie),
@@ -56,26 +48,45 @@ export class DataService {
     static async getMoviesDiscoverPage() {
         const sortBy = "vote_count.desc";
 
-        try {
-            var response = await axios({
-                method: "get",
-                url: "/discover/movie",
-                params: {
-                    page: lastDiscoverPage,
-                    sort_by: sortBy,
-                },
-            });
-        } catch (error) {
-            console.log(error);
-            return {};
-        }
+        const discoverUrl = "/discover/movie";
+
+        
+        const response = await axios({
+            ...this.baseMovieRequest,
+            method: "get",
+            url: discoverUrl,
+            params: {
+                page: lastDiscoverPage,
+                sort_by: sortBy,
+            },
+        });
+        
 
         console.log(lastDiscoverPage);
 
         const moviesObject = this.responseToMoviesObject(response);
+
         lastDiscoverPage++;
         return moviesObject;
     }
-}
 
-DataService.setupAxios();
+    static async getMovieInfo(){}
+
+    static async getMovieVideoId({id: movie_id}){
+        const movieVideoApiUrl = `/movie/${movie_id}/videos`
+        
+        const movieVideos = await axios({
+            ...this.baseMovieRequest,
+            url: movieVideoApiUrl
+        })
+
+        const movieVideo = movieVideos.data.filter(movieVideoInfo => movieVideoInfo.site === "Youtube")[0]
+
+        if (movieVideo === undefined) {
+            return null
+        }
+
+        return movieVideo.key
+        
+    }
+}

@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Card from "./components/Card/Card";
 import CardsList from "./components/CardsList/CardsList";
-import { DataService } from "./DataService/DataService";
 
 function App() {
 
