@@ -10,10 +10,10 @@ $blur-size: 200px;
     width: $card-min-width-horizontal;
     height: calc($card-min-width-horizontal / $card-aspect-ratio);
     border-radius: $card-border-radius;
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-position: center center;
-    background-image: var(--background);
+    // background-repeat: no-repeat;
+    // background-size: cover;
+    // background-position: center center;
+    // background-image: var(--background);
     display: grid;
     padding: 3% 5%;
     grid-template-columns: repeat(2, 1fr);
@@ -56,7 +56,7 @@ $blur-size: 200px;
     }
     .bluredImage{
         border-radius: $card-border-radius;
-        z-index: -1;
+        z-index: -2;
         content: '';
         position: absolute;
         background-repeat: no-repeat;
@@ -103,10 +103,22 @@ $blur-size: 200px;
         height: 100%;
         z-index: 0;
     }
-    // &:after{
-    //     display: block;
-    //     content: "";
-    //     padding-top: calc(100% * (9 / 16));
-    // }
+    &:after{
+        z-index: -1;
+        border-radius: $card-border-radius;
+
+        display: block;
+        position: absolute;
+        content: "";
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-position: center center;
+        background-image: var(--background);
+        opacity: var(--background-opacity);
+    }
 
 }

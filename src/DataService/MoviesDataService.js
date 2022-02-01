@@ -6,7 +6,6 @@ export class MoviesDataService {
     static apiKey =
         "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJjYTFkYzVkNjU0M2E5YzgzM2IxNDNhODc5MGVlOTk5NSIsInN1YiI6IjYxZjJlODA2OWEzYzQ5MDA0NDY5NDU4NCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.ZFB-6d11GjxbaPcH9IsJiTHo4e2IxxNspyF0MmDYpJU";
     static apiUrl = "https://api.themoviedb.org/3";
-    static imageUrl = "https://image.tmdb.org/t/p/original";
 
     static baseMovieRequest = generateBaseRequest(this.apiUrl, this.apiKey)
 
@@ -36,10 +35,12 @@ export class MoviesDataService {
     }
 
     static chooseImage(movie){
+        const imageUrl = "https://image.tmdb.org/t/p/original";
+
         if (movie.backdrop_path !== null){
-            return this.imageUrl + movie.backdrop_path
+            return imageUrl + movie.backdrop_path
         } else if (movie.poster_path !== null){
-            return this.imageUrl + movie.poster_path
+            return imageUrl + movie.poster_path
         } else {
             return null
         }

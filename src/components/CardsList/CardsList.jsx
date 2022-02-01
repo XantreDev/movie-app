@@ -107,7 +107,6 @@ const CardsList = ({ children }) => {
 
         slidesAnimating.current = false
 
-
         const slideWidth = cardWidthRatio * window.innerWidth
         adjustSlides(moveDirection)
 
@@ -148,6 +147,16 @@ const CardsList = ({ children }) => {
         }
     }
 
+    const toCard = (directionRight) => {
+        return () => {
+            if (directionRight) {
+                slideChange(1)
+            } else {
+                slideChange(-1)
+            }
+        }
+    }
+    
     return (
         <div
             // onLoad={_ => fetchSlides(1)}
@@ -157,7 +166,13 @@ const CardsList = ({ children }) => {
             onKeyDown={key => console.log(key)}
         >
             { slides.lenght !== 0 ? (
-                slides.map((slide) => <Card {...slide} />)
+                slides.map((slide, i) => 
+                    <Card 
+                        onClick={Math.abs(i - medianSlide) === 1? 
+                            _ => toCard(i - medianSlide) : {}}
+                        focus={i === medianSlide ? true : false} 
+                        key={slide.title} {...slide} 
+                    />)
             ) : (
                 <h1>Loading</h1>
             )}
