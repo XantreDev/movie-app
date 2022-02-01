@@ -1,9 +1,9 @@
 import React, { useRef, useState, useEffect } from "react";
 import styles from "./CardsList.module.scss";
-import { DataService } from "./../../DataService/DataService";
 import Card from "./../Card/Card";
 import { useBound } from './../../hooks/useBound';
 import animateScrollTo from "animated-scroll-to";
+import { MoviesDataService } from "../../DataService/MoviesDataService";
 
 const CardsList = ({ children }) => {
     const slidesCount = 9;
@@ -51,7 +51,7 @@ const CardsList = ({ children }) => {
     useEffect((_) => reciveMovies(), []);
 
     const reciveMovies = async () => {
-        const moviesList = await DataService.getMoviesDiscoverPage();
+        const moviesList = await MoviesDataService.getMoviesDiscoverPage();
         setLoadedMovies(moviesList);
         const slidesBoundares = {
             left: moviesList.length / 2 - medianSlide,
@@ -98,7 +98,7 @@ const CardsList = ({ children }) => {
         const nearLeft = slideBorderIndexes.left <= 2
         const nearRight = slideBorderIndexes.right >= loadedMovies.length - 3
         if (nearLeft || nearRight){
-            const newMoviesPage = await DataService.getMoviesDiscoverPage()
+            const newMoviesPage = await MoviesDataService.getMoviesDiscoverPage()
             addNewMovies({ newMoviesPage, nearLeft, nearRight })
             if (nearLeft){            
                 moveBorderDistance = newMoviesPage.length
