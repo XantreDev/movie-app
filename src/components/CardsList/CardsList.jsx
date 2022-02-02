@@ -5,7 +5,7 @@ import { useBound } from './../../hooks/useBound';
 import animateScrollTo from "animated-scroll-to";
 import { MoviesDataService } from "../../DataService/MoviesDataService";
 
-const CardsList = ({ children }) => {
+const CardsList = () => {
     const slidesCount = 9;
     const medianSlide = (slidesCount - 1) / 2
     const [slides, setSlides] = useState([]);
@@ -17,32 +17,32 @@ const CardsList = ({ children }) => {
         right: slidesCount - 1
     });
 
-    useEffect(_ => {
-        const handleResize = () => {
-            const medianCardXCoord = medianSlide * window.innerWidth * cardWidthRatio
-            cardsListRef.current.scrollTo(medianCardXCoord, 0)
-        } 
-
-        window.addEventListener('resize', handleResize)
-
-        return _ => {
-            window.removeEventListener('click', handleResize)
+    
+    const moveSlide = key => {
+        console.log(key)
+        if (key.keyCode === 39 || key.keyCode === 34) {
+            slideChange(1)
+        } else if (key.keyCode === 37 || key.keyCode === 33){
+            slideChange(-1)
         }
-    })
+    }
 
     useEffect(_ => {
-        const moveSlide = key => {
-            if (key.keyCode === 39 || key.keyCode === 34) {
-                slideChange(1)
-            } else if (key.keyCode === 37 || key.keyCode === 33){
-                slideChange(-1)
-            }
-        }
-
         window.addEventListener('keydown', moveSlide)
+        window.addEventListener('resize', handleResize)
+        
+        return _ => {
+            window.removeEventListener('keydown', moveSlide)
+            window.removeEventListener('resize', handleResize)
+        }
+    }, [])
 
-        return _ => window.removeEventListener('keydown', moveSlide)
-    })
+    const handleResize = _ => {
+        const medianCardXCoord = medianSlide * window.innerWidth * cardWidthRatio
+        cardsListRef.current.scrollTo(medianCardXCoord, 0)
+    }
+    
+
 
     const cardsListRef = useRef();
     const slidesAnimating = useRef(false)
@@ -67,6 +67,7 @@ const CardsList = ({ children }) => {
     };
 
 
+
     const cardWidthRatio = 0.8;
 
     const adjustSlides = (moveDirection) => {
@@ -79,6 +80,13 @@ const CardsList = ({ children }) => {
             setSlides([loadedMovies[slideBorderIndexes.left - 1], ...slides.slice(0, -1)])
 
         }
+
+        
+        setSlides(prev => {
+            console.log('aboba')
+            console.log(prev)
+            return prev
+        })
     }
 
     const moveBorders = (distance) => {
@@ -149,13 +157,14 @@ const CardsList = ({ children }) => {
 
     const toCard = (directionRight) => {
         return () => {
-            if (directionRight) {
+            if (directionRight > 0) {
                 slideChange(1)
             } else {
                 slideChange(-1)
             }
         }
     }
+
     
     return (
         <div
@@ -167,12 +176,13 @@ const CardsList = ({ children }) => {
         >
             { slides.lenght !== 0 ? (
                 slides.map((slide, i) => 
-                    <Card 
-                        onClick={Math.abs(i - medianSlide) === 1? 
-                            _ => toCard(i - medianSlide) : {}}
+                    (<Card 
+                        onClick={Math.abs(i - medianSlide) === 1 ? 
+                            toCard(i - medianSlide) : _ => {}} 
                         focus={i === medianSlide ? true : false} 
-                        key={slide.title} {...slide} 
-                    />)
+                        key={slide.title} 
+                        {...slide} 
+                    />))
             ) : (
                 <h1>Loading</h1>
             )}

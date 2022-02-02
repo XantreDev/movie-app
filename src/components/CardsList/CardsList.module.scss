@@ -18,4 +18,8 @@
        padding-left: 5vw; 
        content: '';
     }
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
 }

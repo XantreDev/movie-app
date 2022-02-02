@@ -1,0 +1,54 @@
+@import "./../../Card/Card.module.scss";
+
+@mixin fillCard {
+    width: 100%;
+    border: none;
+    height: 100%;
+    position: absolute;
+}
+
+.videoContainer {
+    @include fillCard;
+
+    z-index: 0;
+    overflow: hidden;
+    
+    border-radius: $card-border-radius;
+    transition: opacity 3s ease-in;
+    pointer-events: none;
+}
+
+.video {
+    @include fillCard;
+    height: 120%;
+    transform: translateY(-10%);
+    z-index: -1;
+    opacity: 1;
+}
+
+
+.videoTransitionEnter {
+    opacity: 0;
+}
+
+.videoTransitionEnterActive {
+    opacity: 1;
+    transition: opacicy 100ms ease-in-out;
+}
+
+
+.videoTransitionExit {
+    opacity: 1;
+}
+
+.videoTransitionExitActive {
+    opacity: 0;
+    transition: opacicy 100ms ease-in-out;
+}
+
+.videoCover {
+    background: none;
+    display: block;
+    position: absolute;
+    z-index: 2;
+}

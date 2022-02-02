@@ -51,7 +51,6 @@ export class MoviesDataService {
 
         const discoverUrl = "/discover/movie";
 
-        
         const response = await axios({
             ...this.baseMovieRequest,
             method: "get",
@@ -62,7 +61,7 @@ export class MoviesDataService {
             },
         });
         
-
+        console.log(response)
         console.log(lastDiscoverPage);
 
         const moviesObject = this.responseToMoviesObject(response);
@@ -73,15 +72,18 @@ export class MoviesDataService {
 
     static async getMovieInfo(){}
 
-    static async getMovieVideoId({id: movie_id}){
+    static async getMovieVideoId(movie_id){
         const movieVideoApiUrl = `/movie/${movie_id}/videos`
-        
+
         const movieVideos = await axios({
             ...this.baseMovieRequest,
             url: movieVideoApiUrl
         })
 
-        const movieVideo = movieVideos.data.filter(movieVideoInfo => movieVideoInfo.site === "Youtube")[0]
+        if (movieVideos.data.results.length === undefined){
+            return null
+        }
+        const movieVideo = movieVideos.data.results.filter(movieVideoInfo => movieVideoInfo.site === "YouTube")[0]
 
         if (movieVideo === undefined) {
             return null
