@@ -35,12 +35,23 @@ export class MoviesDataService {
     }
 
     static chooseImage(movie){
-        const imageUrl = "https://image.tmdb.org/t/p/original";
+        const lowResImageUrl = "https://image.tmdb.org/t/p/w300";
+        const middleResImageUrl = "https://image.tmdb.org/t/p/w500"
+        const highResImageUrl = "https://image.tmdb.org/t/p/original"
 
         if (movie.backdrop_path !== null){
-            return imageUrl + movie.backdrop_path
+            return {
+                lowRes: lowResImageUrl + movie.backdrop_path,
+                middleRes: middleResImageUrl + movie.backdrop_path,
+                highRes: highResImageUrl + movie.backdrop_path
+                
+            }
         } else if (movie.poster_path !== null){
-            return imageUrl + movie.poster_path
+            return {
+                lowRes: lowResImageUrl + movie.poster_path,
+                middleRes: middleResImageUrl + movie.poster_path,
+                highRes: highResImageUrl + movie.poster_path
+            }
         } else {
             return null
         }
@@ -61,9 +72,6 @@ export class MoviesDataService {
             },
         });
         
-        console.log(response)
-        console.log(lastDiscoverPage);
-
         const moviesObject = this.responseToMoviesObject(response);
 
         lastDiscoverPage++;

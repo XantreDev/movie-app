@@ -1,11 +1,7 @@
 @import "./../../Card/Card.module.scss";
 
-@mixin fillCard {
-    width: 100%;
-    border: none;
-    height: 100%;
-    position: absolute;
-}
+$scale-for-16-9: 1.35;
+$scale-for-9-16: 3.15;
 
 .videoContainer {
     @include fillCard;
@@ -21,9 +17,16 @@
 .video {
     @include fillCard;
     height: 120%;
-    transform: translateY(-10%);
+    transform-origin: center center;
+    transform: scale($scale-for-16-9) translateY(-6.5%);
     z-index: -1;
     opacity: 1;
+}
+
+@media (max-aspect-ratio: 1 / 1) {
+    .video{
+        transform: scale($scale-for-9-16) translateY(-2.75%);
+    }
 }
 
 

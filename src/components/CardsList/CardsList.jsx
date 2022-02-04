@@ -5,42 +5,47 @@ import { useBound } from './../../hooks/useBound';
 import animateScrollTo from "animated-scroll-to";
 import { MoviesDataService } from "../../DataService/MoviesDataService";
 
+const slidesCount = 5;
+const medianSlide = (slidesCount - 1) / 2
+
 const CardsList = () => {
-    const slidesCount = 9;
-    const medianSlide = (slidesCount - 1) / 2
     const [slides, setSlides] = useState([]);
 
-    const [loadedMovies, setLoadedMovies] = useState([]);
-    const [slideBorderIndexes, setSlideBorderIndexes] = useState({
+    const loadedMovies = useRef([]);
+    const slideBorderIndexes = useRef({
         left: 0,
         current: 0,
         right: slidesCount - 1
     });
 
     
-    const moveSlide = key => {
-        console.log(key)
-        if (key.keyCode === 39 || key.keyCode === 34) {
-            slideChange(1)
-        } else if (key.keyCode === 37 || key.keyCode === 33){
-            slideChange(-1)
-        }
-    }
 
     useEffect(_ => {
+        const handleResize = _ => {
+            const medianCardXCoord = medianSlide * window.innerWidth * cardWidthRatio
+            cardsListRef.current.scrollTo(medianCardXCoord, 0)
+        }
+    
+        
+        const moveSlide = key => {
+            console.log(key)
+            if (key.keyCode === 39 || key.keyCode === 34) {
+                key.preventDefault()
+                slideChange(1)
+            } else if (key.keyCode === 37 || key.keyCode === 33){
+                key.preventDefault()
+                slideChange(-1)
+            }
+        }
+
         window.addEventListener('keydown', moveSlide)
         window.addEventListener('resize', handleResize)
-        
+
         return _ => {
             window.removeEventListener('keydown', moveSlide)
             window.removeEventListener('resize', handleResize)
         }
     }, [])
-
-    const handleResize = _ => {
-        const medianCardXCoord = medianSlide * window.innerWidth * cardWidthRatio
-        cardsListRef.current.scrollTo(medianCardXCoord, 0)
-    }
     
 
 
@@ -52,15 +57,14 @@ const CardsList = () => {
 
     const reciveMovies = async () => {
         const moviesList = await MoviesDataService.getMoviesDiscoverPage();
-        setLoadedMovies(moviesList);
+        loadedMovies.current = moviesList;
         const slidesBoundares = {
             left: moviesList.length / 2 - medianSlide,
             current: moviesList.length / 2,
-            right: moviesList.length / 2 + medianSlide
+            right: moviesList.length / 2 + medianSlide + 1
         }
-        console.log(slidesBoundares)
         setSlides(moviesList.slice(slidesBoundares.left, slidesBoundares.right));
-        setSlideBorderIndexes(slidesBoundares)
+        slideBorderIndexes.current = slidesBoundares
 
         const medianCardXCoord = medianSlide * window.innerWidth * cardWidthRatio
         cardsListRef.current.scrollTo(medianCardXCoord, 0)
@@ -71,40 +75,30 @@ const CardsList = () => {
     const cardWidthRatio = 0.8;
 
     const adjustSlides = (moveDirection) => {
+        console.log(slides)
         if (moveDirection === 1){
-            setSlides([...slides.slice(1), loadedMovies[slideBorderIndexes.right + 1]])
+            setSlides([...slides.slice(1), loadedMovies.current[slideBorderIndexes.current.right + 1]])
             // setSlides([...slides.slice(deltaSlide), ...loadedMovies.slice(slideBorderIndexes.right + 1, slideBorderIndexes.right + deltaSlide)])
             
             
         } else if (moveDirection === -1) {
-            setSlides([loadedMovies[slideBorderIndexes.left - 1], ...slides.slice(0, -1)])
-
+            setSlides([loadedMovies.current[slideBorderIndexes.current.left - 1], ...slides.slice(0, -1)])
         }
-
-        
-        setSlides(prev => {
-            console.log('aboba')
-            console.log(prev)
-            return prev
-        })
     }
 
     const moveBorders = (distance) => {
         return ({
-            left: slideBorderIndexes.left + distance,
-            current: slideBorderIndexes.current + distance,
-            right: slideBorderIndexes.right + distance
+            left: slideBorderIndexes.current.left + distance,
+            current: slideBorderIndexes.current.current + distance,
+            right: slideBorderIndexes.current.right + distance
         })
     }
 
     const fetchSlides = async (newCurrentSlideIndex, moveDirection) => {
-        // console.log(moveDirection)
-        console.log(loadedMovies)
-        console.log(slideBorderIndexes)
         let moveBorderDistance = 0
 
-        const nearLeft = slideBorderIndexes.left <= 2
-        const nearRight = slideBorderIndexes.right >= loadedMovies.length - 3
+        const nearLeft = slideBorderIndexes.current.left <= 2
+        const nearRight = slideBorderIndexes.current.right >= loadedMovies.current.length - 3
         if (nearLeft || nearRight){
             const newMoviesPage = await MoviesDataService.getMoviesDiscoverPage()
             addNewMovies({ newMoviesPage, nearLeft, nearRight })
@@ -113,15 +107,15 @@ const CardsList = () => {
             }
         }
 
-        slidesAnimating.current = false
-
+        
         const slideWidth = cardWidthRatio * window.innerWidth
         adjustSlides(moveDirection)
-
+        
         cardsListRef.current.scrollBy(moveDirection * -slideWidth, 0)
         setCurrentSlide(newCurrentSlideIndex - moveDirection)
+        slidesAnimating.current = false
         
-        setSlideBorderIndexes(moveBorders(moveBorderDistance + moveDirection))
+        slideBorderIndexes.current = moveBorders(moveBorderDistance + moveDirection)
     };
 
     
@@ -130,28 +124,25 @@ const CardsList = () => {
         if (slidesAnimating.current){
             return
         }
-
+        
         const moveDirection = deltaY > 0 ? 1 : -1;
         const newCurrentSlide = currentSlide + moveDirection
         const newSlidePosition = cardWidthRatio * newCurrentSlide * window.innerWidth
         
         setCurrentSlide(newCurrentSlide)
         slidesAnimating.current = true
-        await animateScrollTo([newSlidePosition, 0], {
-            elementToScroll: cardsListRef.current,
-            cancelOnUserAction: false
-        })
+        cardsListRef.current.scrollTo({left: newSlidePosition, behavior: "smooth"})
         
-        fetchSlides(newCurrentSlide, moveDirection)
+        
 
+        setTimeout(_ => fetchSlides(newCurrentSlide, moveDirection), 750)
     }
 
     const addNewMovies = ({newMoviesPage: moviesObject, nearLeft,  nearRight}) => {
-        moviesObject.map(movie => console.log(movie.title))
         if (nearLeft){
-            setLoadedMovies([...moviesObject, ...loadedMovies])
+            loadedMovies.current = [...moviesObject, ...loadedMovies.current]
         } else {
-            setLoadedMovies([...loadedMovies, ...moviesObject])
+            loadedMovies.current = [...loadedMovies.current, ...moviesObject]
         }
     }
 
@@ -159,11 +150,12 @@ const CardsList = () => {
         return () => {
             if (directionRight > 0) {
                 slideChange(1)
-            } else {
+            } else if (directionRight < 0) {
                 slideChange(-1)
             }
         }
     }
+
 
     
     return (
@@ -172,13 +164,14 @@ const CardsList = () => {
             ref={cardsListRef}
             onWheel={wheel => slideChange(wheel.deltaY)}
             className={styles.list}
-            onKeyDown={key => console.log(key)}
         >
             { slides.lenght !== 0 ? (
                 slides.map((slide, i) => 
                     (<Card 
                         onClick={Math.abs(i - medianSlide) === 1 ? 
                             toCard(i - medianSlide) : _ => {}} 
+                        near={Math.abs(i - medianSlide) <= 1 ?
+                            true : false}
                         focus={i === medianSlide ? true : false} 
                         key={slide.title} 
                         {...slide} 
@@ -191,3 +184,4 @@ const CardsList = () => {
 };
 
 export default CardsList;
+

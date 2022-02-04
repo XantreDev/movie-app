@@ -1,10 +1,16 @@
 .list{
+
     position: relative;
-    height: 100vh;
+    height: 100%;
     gap: 0 10vw;
     display: flex;
+    // justify-content:space-around ;
     align-items: center;
-    width: 100%;
+    // width: 100;
+
+    padding-left: 15vw;
+    padding-right: 10vw;
+    // margin-right: -5vw;
     
     overflow-x: scroll;
     overflow-y: hidden;
@@ -12,12 +18,13 @@
 
     & > *{
         flex: 0 0 70vw;
+        // margin-left: 5vw;
     }
 
-    &:before {
-       padding-left: 5vw; 
-       content: '';
-    }
+    // &:before {
+    // //    margin-left: 5vw; 
+    //    content: '';
+    // }
 
     &::-webkit-scrollbar {
         display: none;
