@@ -20,7 +20,6 @@ $input-font: "IBM Plex Sans Thai Looped", Arial, sans-serif;
     justify-content: center;
     align-content: center;
 
-
     .container {
         display: flex;
         justify-content: center;
@@ -42,7 +41,7 @@ $input-font: "IBM Plex Sans Thai Looped", Arial, sans-serif;
         }
 
         .submitButton {
-            $submit-width: 8rem;
+            $submit-width: clamp(9rem, 15%, 20rem);
             $submit-padding-rigth: 0.5rem;
 
             position: absolute;
@@ -65,12 +64,12 @@ $input-font: "IBM Plex Sans Thai Looped", Arial, sans-serif;
             }
 
             .hoverSubmitButtonAnimation {
-                $hover-width: calc(4ch - 0.5rem);
+                $hover-width: calc(4ch - 0.5ch);
 
                 background-color: black;
                 position: absolute;
                 bottom: calc(50% - $submit-button-font-size / 2 + 0.1rem);
-                left: calc(($submit-width - $submit-padding-rigth) / 2 - $hover-width / 2);
+                left: calc(50% - $hover-width / 2 - 0.125ch);
                 width: $hover-width;
                 font-size: inherit;
                 height: .1rem;
@@ -79,10 +78,6 @@ $input-font: "IBM Plex Sans Thai Looped", Arial, sans-serif;
                 transition: transform 300ms ease-in-out;
 
             }
-
-            // &:hover .hoverSubmitButtonAnimation {
-
-            // }
         }
 
 

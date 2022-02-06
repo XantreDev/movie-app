@@ -6,7 +6,7 @@ $scale-for-9-16: 3.15;
 .videoContainer {
     @include fillCard;
 
-    z-index: 0;
+    z-index: -2;
     overflow: hidden;
     
     border-radius: $card-border-radius;
@@ -53,5 +53,5 @@ $scale-for-9-16: 3.15;
     background: none;
     display: block;
     position: absolute;
-    z-index: 2;
+    z-index: -1;
 }

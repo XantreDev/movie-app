@@ -125,12 +125,12 @@ const CardsList = () => {
             return
         }
         
+        slidesAnimating.current = true
         const moveDirection = deltaY > 0 ? 1 : -1;
         const newCurrentSlide = currentSlide + moveDirection
         const newSlidePosition = cardWidthRatio * newCurrentSlide * window.innerWidth
         
         setCurrentSlide(newCurrentSlide)
-        slidesAnimating.current = true
         cardsListRef.current.scrollTo({left: newSlidePosition, behavior: "smooth"})
         
         
@@ -168,8 +168,13 @@ const CardsList = () => {
             { slides.lenght !== 0 ? (
                 slides.map((slide, i) => 
                     (<Card 
-                        onClick={Math.abs(i - medianSlide) === 1 ? 
-                            toCard(i - medianSlide) : _ => {}} 
+                        onClick={event => {
+                            event.preventDefault()
+                            if (Math.abs(medianSlide - i)){
+                                toCard(i - medianSlide)()
+                            }
+                            }
+                        } 
                         near={Math.abs(i - medianSlide) <= 1 ?
                             true : false}
                         focus={i === medianSlide ? true : false} 

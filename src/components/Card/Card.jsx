@@ -10,6 +10,9 @@ const Card = ({ title, rating, image, id, near, ...props }) => {
     const [videoId, setVideoId] = useState("")
 
     const backgroundCssVariable = {"--background": `url(${image.highRes})`, "--background-blur": `url(${image.lowRes})`}
+    const learnMoreVisibility = {
+        "--before-visability": props.focus ? "visible" : "hidden"
+    }
 
     useEffect(_ => {
         MoviesDataService.getMovieVideoId(id).then(key => {
@@ -24,7 +27,7 @@ const Card = ({ title, rating, image, id, near, ...props }) => {
             if (videoId !== "" && props.focus && !needToDraw) {
                  needToDrawUnmount.current = setTimeout(_ =>
                     setNeedToDraw(true)
-                    , 300000
+                    , 30_000_000
                 )
             } 
             if (!props.focus) {
@@ -42,13 +45,18 @@ const Card = ({ title, rating, image, id, near, ...props }) => {
     return (
         <div
             style={{ 
-                ...backgroundCssVariable
+                ...backgroundCssVariable,
+                ...learnMoreVisibility
             }}
             onClick = {props.onClick}
 
             className={styles.card}
         >
-            
+            {props.focus ? ( 
+            <div className={styles.learnMoreContainer}>
+                <div className={styles.learnMore}>Learn more</div>
+            </div>) : ""
+            }   
             <div className={styles.bluredImage}></div>
         {
             near ?
@@ -56,9 +64,8 @@ const Card = ({ title, rating, image, id, near, ...props }) => {
                 : ""
             }
             
-            <div className={styles.like}>Like</div>
-            <div className={styles.title}>{title}</div>
-            <div className={styles.rating}>{`${rating}/10`}</div>
+            <div className={`${styles.title} ${styles.captionBlock}`}>{title}</div>
+            <div className={`${styles.rating} ${styles.captionBlock}`}>{`${rating}`}</div>
         </div>
     );
 };

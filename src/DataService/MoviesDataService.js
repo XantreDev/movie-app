@@ -78,7 +78,16 @@ export class MoviesDataService {
         return moviesObject;
     }
 
-    static async getMovieInfo(){}
+    static async getMovieInfo(movieId) {
+        const movieInfoUrl = `/movie/${movieId}`
+
+        const movieInfo = await axios({
+            ...this.baseMovieRequest,
+            url: movieInfoUrl
+        })
+
+        // console.log(movieInfoUrl)
+    }
 
     static async getMovieVideoId(movie_id){
         const movieVideoApiUrl = `/movie/${movie_id}/videos`
@@ -102,11 +111,16 @@ export class MoviesDataService {
     }
 
     static async findMovieByQuery(query) {
-        const movieList = await axios({
+        const movieFindUrl = '/search/movie'
+        const request = axios({
             ...this.baseMovieRequest,
+            method: 'GET',
+            url: movieFindUrl,
             params: {
-                query: encodeURI(query)
+                query: query
             }
         })
+        const movieList = await request
+        console.log(movieList)
     }
 }
