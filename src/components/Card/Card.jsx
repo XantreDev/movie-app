@@ -24,7 +24,7 @@ const Card = ({ title, rating, image, id, near, ...props }) => {
             if (videoId !== "" && props.focus && !needToDraw) {
                  needToDrawUnmount.current = setTimeout(_ =>
                     setNeedToDraw(true)
-                    , 30000
+                    , 300000
                 )
             } 
             if (!props.focus) {

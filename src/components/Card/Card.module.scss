@@ -1,5 +1,5 @@
 @use "sass:math";
-$card-min-width-horizontal: 70vw;
+$card-width-horizontal: min(70vw, 190rem);
 $card-min-height-vertical: 70vh;
 $card-aspect-ratio: math.div(16, 9);
 // $card-min-width: clamp(90rem, 50vw, 200rem);
@@ -14,8 +14,9 @@ $blur-size: 200px;
 
 .card{
 
-    width: $card-min-width-horizontal;
-    height: calc($card-min-width-horizontal / $card-aspect-ratio);
+    width: $card-width-horizontal;
+    height: calc($card-width-horizontal / $card-aspect-ratio);
+    max-height: $card-min-height-vertical;
     border-radius: $card-border-radius;
     // background-repeat: no-repeat;
     // background-size: cover;
@@ -31,7 +32,6 @@ $blur-size: 200px;
     font-size: 3rem;
     position: relative;
     transition: transform 1s ease-in-out;
-
 
 
     @media (max-aspect-ratio: 1 / 1) {

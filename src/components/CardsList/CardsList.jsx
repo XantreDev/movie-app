@@ -31,10 +31,10 @@ const CardsList = () => {
             console.log(key)
             if (key.keyCode === 39 || key.keyCode === 34) {
                 key.preventDefault()
-                slideChange(1)
+                // slideChange(1)
             } else if (key.keyCode === 37 || key.keyCode === 33){
                 key.preventDefault()
-                slideChange(-1)
+                // slideChange(-1)
             }
         }
 

@@ -100,4 +100,13 @@ export class MoviesDataService {
         return movieVideo.key
         
     }
+
+    static async findMovieByQuery(query) {
+        const movieList = await axios({
+            ...this.baseMovieRequest,
+            params: {
+                query: encodeURI(query)
+            }
+        })
+    }
 }
