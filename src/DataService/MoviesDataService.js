@@ -80,10 +80,14 @@ export class MoviesDataService {
 
     static async getMovieInfo(movieId) {
         const movieInfoUrl = `/movie/${movieId}`
+        const additionalCategory = 'credits'
 
         const movieInfo = await axios({
             ...this.baseMovieRequest,
-            url: movieInfoUrl
+            url: movieInfoUrl,
+            params: {
+                append_to_response: additionalCategory
+            }
         })
 
         // console.log(movieInfoUrl)

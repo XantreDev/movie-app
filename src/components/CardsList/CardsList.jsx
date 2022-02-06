@@ -2,7 +2,6 @@ import React, { useRef, useState, useEffect } from "react";
 import styles from "./CardsList.module.scss";
 import Card from "./../Card/Card";
 import { useBound } from './../../hooks/useBound';
-import animateScrollTo from "animated-scroll-to";
 import { MoviesDataService } from "../../DataService/MoviesDataService";
 
 const slidesCount = 5;
@@ -18,7 +17,11 @@ const CardsList = () => {
         right: slidesCount - 1
     });
 
-    
+    // useEffect(_ => {
+    //     if (localStorage.getItem('loadedMovies') !== undefined) {
+    //         const ca
+    //     }
+    // }, [])    
 
     useEffect(_ => {
         const handleResize = _ => {

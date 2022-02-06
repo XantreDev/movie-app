@@ -6,7 +6,7 @@ const Search = () => {
     return (
   <div>
       {
-          movies.map(movie => 
+            movies.map(movie => 
                 <SearchCard {...movie}/>
             )
       }
