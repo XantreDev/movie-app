@@ -1,7 +1,6 @@
 import axios from "axios";
 import { generateBaseRequest } from "../utils/utils";
 
-let lastDiscoverPage = 1;
 export class MoviesDataService {
     static apiKey =
         "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJjYTFkYzVkNjU0M2E5YzgzM2IxNDNhODc5MGVlOTk5NSIsInN1YiI6IjYxZjJlODA2OWEzYzQ5MDA0NDY5NDU4NCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.ZFB-6d11GjxbaPcH9IsJiTHo4e2IxxNspyF0MmDYpJU";
@@ -57,7 +56,7 @@ export class MoviesDataService {
         }
     }
 
-    static async getMoviesDiscoverPage() {
+    static async getMoviesDiscoverPage(targetPage) {
         const sortBy = "vote_count.desc";
 
         const discoverUrl = "/discover/movie";
@@ -67,14 +66,13 @@ export class MoviesDataService {
             method: "get",
             url: discoverUrl,
             params: {
-                page: lastDiscoverPage,
+                page: targetPage,
                 sort_by: sortBy,
             },
         });
         
         const moviesObject = this.responseToMoviesObject(response);
 
-        lastDiscoverPage++;
         return moviesObject;
     }
 
@@ -118,13 +116,13 @@ export class MoviesDataService {
         const movieFindUrl = '/search/movie'
         const request = axios({
             ...this.baseMovieRequest,
-            method: 'GET',
             url: movieFindUrl,
             params: {
-                query: query
+                query
             }
         })
+        console.log(request)
         const movieList = await request
-        console.log(movieList)
+        return movieList.data.results
     }
 }

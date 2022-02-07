@@ -1,13 +1,21 @@
 import React, { useState } from "react";
 import styles from "./Nav.module.scss";
 import searchIcon from "./imgs/search_icon.svg"
-import { MoviesDataService } from "../../DataService/MoviesDataService";
+import { useDispatch, useSelector } from "react-redux";
+import { bindActionCreators } from "@reduxjs/toolkit";
+import { ActionCreators } from "../../state";
 
 const Nav = () => {
-    const [inputText, setInputText] = useState('');
+    const searchRequestFromStore = useSelector(state => state.searchRequest)
+    const searchRequest = searchRequestFromStore !== null ? searchRequestFromStore : ''
+    const navigate = useSelector(state => state.navigate)
+    const dispatch = useDispatch()
+
+    const { changeSearchRequest } = bindActionCreators(ActionCreators, dispatch)
+
     const findMovie = e => {
         e.preventDefault()
-        MoviesDataService.findMovieByQuery(inputText).then()
+        navigate("/search", {replace: false})
     }
 
     return (
@@ -15,8 +23,8 @@ const Nav = () => {
             <div className={styles.container}>
                 <img className={styles.searchIcon} src={searchIcon} alt=""/>
                 <input
-                    value={inputText}
-                    onChange={value => setInputText(_ => value.target.value)}
+                    value={searchRequest}
+                    onChange={event => changeSearchRequest(event.target.value)}
                     className={styles.input}
                     type="search"
                     name=""
