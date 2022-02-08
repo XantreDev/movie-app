@@ -1,5 +1,6 @@
 import { SEARCH_ACTION_TYPES } from '../reducers/searchReducer';
 import { NAVIGATE_ACTION_TYPES } from '../reducers/navigateReducer';
+import { CARDSLIST_ACTIONS_TYPE } from '../reducers/cardsListReducer'
 
 export const changeSearchRequest = (searchRequest) => {
     return dispatch => {
@@ -31,6 +32,32 @@ export const unsetNavigate = _ => {
     return dispatch => {
         dispatch({
             type: NAVIGATE_ACTION_TYPES.UNSET_NAVIGATION
+        })
+    }
+}
+
+export const setCardsList = slide => {
+    return dispatch => {
+        dispatch({
+            type: CARDSLIST_ACTIONS_TYPE.SET_CARDLIST,
+            payload: slide
+        })
+    }
+}
+
+export const grabCardsListFromCache = _ => {
+    return dispatch => {
+        dispatch({
+            type: CARDSLIST_ACTIONS_TYPE.GRAB_CARDSLIST_FROM_CACHE
+        })
+    }
+}
+
+export const loadCardsList = side => {
+    return dispatch => {
+        dispatch({
+            action: CARDSLIST_ACTIONS_TYPE.LOAD_CARDSLIST,
+            payload: side,
         })
     }
 }

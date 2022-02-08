@@ -6,6 +6,7 @@ import { bindActionCreators } from "@reduxjs/toolkit";
 import { ActionCreators } from "./state";
 import Nav from "./components/Nav/Nav";
 import { setCachedSearchRequest } from './local-storage/cacheSearchRequest';
+import PageWrapper from "./components/UI/PageWrapper/PageWrapper";
 
 const SearchPage = () => {
     const [movies, setMovies] = useState([]);
@@ -36,12 +37,12 @@ const SearchPage = () => {
     }
 
     return (
-        <div>
+        <PageWrapper>
             <Nav />
             {movies.map((movie) => (
                 <SearchCard {...movie} />
             ))}
-        </div>
+        </PageWrapper>
     );
 };
 
