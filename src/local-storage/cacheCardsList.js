@@ -14,11 +14,19 @@ export const isCachedCardsListExist = _ => {
             localStorage.getItem(LOCAL_STORAGE_KEYS.LAST_PAGE) !== null )
 }
 
-
 export const updateCachedCardsList = ({moviesList, lastPage, newCurrentSlide}) => {
     localStorage.setItem(LOCAL_STORAGE_KEYS.LOADED_MOVIES, JSON.stringify(moviesList))
     localStorage.setItem(LOCAL_STORAGE_KEYS.LAST_PAGE, JSON.stringify(lastPage))
     localStorage.setItem(LOCAL_STORAGE_KEYS.CURRENT_SLIDE, JSON.stringify(newCurrentSlide))
+}
+
+
+export const updateCachedCardsListFromObject = cardsListObject => {
+    updateCachedCardsList({
+        moviesList: cardsListObject.loadedCards,
+        newCurrentSlide: cardsListObject.currentCard,
+        lastPage: cardsListObject.lastPage
+    })
 }
 
 export const updateCachedCardsListCurrentIndex = ({newCurrentIndex}) => {

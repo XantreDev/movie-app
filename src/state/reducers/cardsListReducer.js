@@ -4,14 +4,13 @@ import {
 } from '../../local-storage/cacheCardsList';
 import { MoviesDataService } from '../../DataService/MoviesDataService';
 export const CARDSLIST_ACTIONS_TYPE = {
-    SET_CARDLIST: 'setSlide',
+    SET_LOADED_MOVIES: 'setSlide',
     GRAB_CARDSLIST_FROM_CACHE: 'readSlideFromCache',
+    APPEND_CARDSLIST_LEFT: 'appendLeft',
+    APPEND_CARDSLIST_RIGHT: 'appendRight',
+    MOVE_CURRENT_CARD_LEFT: 'moveLeft',
+    MOVE_CURRENT_CARD_RIGHT: 'moveRight',
     LOAD_CARDSLIST: 'loadCardsList'
-}
-
-export const CARDSLIST_LOAD_SIDES = {
-    LEFT: 'left',
-    RIGHT: 'right'
 }
 
 const CARDLIST_OBJECT = {
@@ -28,10 +27,14 @@ const cardsListsFabric = ({ currentCard, loadedCards, lastPage }) => {
     }
 }
 
-const cardsListReducer = async (state = null, action) => {
+const cardsListReducer = (state = CARDLIST_OBJECT, action) => {
     switch (action.type) {
-        case CARDSLIST_ACTIONS_TYPE.SET_CARDLIST:
-            return action.payload
+        case CARDSLIST_ACTIONS_TYPE.SET_LOADED_MOVIES:
+            return cardsListsFabric({
+                ...state,
+                loadedCards: [...action.payload],
+                lastPage: 2
+            })
         case CARDSLIST_ACTIONS_TYPE.GRAB_CARDSLIST_FROM_CACHE:
             if (isCachedCardsListExist()) {
                 const { cachedMovies: loadedCards, cachedCurrentSlideIndex: currentCard, lastPageIndex } = getCachedCardsList()
@@ -44,28 +47,30 @@ const cardsListReducer = async (state = null, action) => {
             else {
                 return CARDLIST_OBJECT
             }
-        case CARDSLIST_ACTIONS_TYPE.LOAD_CARDSLIST:
-            if (state === null) {
-                const loadedCards = await MoviesDataService.getMoviesDiscoverPage(1)
-                return cardsListsFabric({
-                    ...CARDLIST_OBJECT,
-                    loadedCards: loadedCards
-                })
-            }
-            const targetPage = CARDLIST_OBJECT.lastPage
-            const loadedCards = await MoviesDataService.getMoviesDiscoverPage(targetPage)
-            if (action.payload === CARDSLIST_LOAD_SIDES.LEFT) {
-                return cardsListsFabric({
-                    currentCard: state.currentCard + loadedCards.length,
-                    loadedCards: [...loadedCards, state.loadedCards],
-                    lastPage: targetPage + 1
-                })
-            }
-
+        case CARDSLIST_ACTIONS_TYPE.APPEND_CARDSLIST_LEFT:
+            return cardsListsFabric({
+                currentCard: state.currentCard + action.payload.length,
+                loadedCards: [...action.payload, ...state.loadedCards],
+                lastPage: state.lastPage + 1
+            })
+        case CARDSLIST_ACTIONS_TYPE.APPEND_CARDSLIST_RIGHT:
             return cardsListsFabric({
                 currentCard: state.currentCard,
-                loadedCards: [state.loadedCards, ...loadedCards],
-                lastPage: targetPage + 1
+                loadedCards: [...state.loadedCards, ...action.payload],
+                lastPage: state.lastPage + 1
+            })
+        case CARDSLIST_ACTIONS_TYPE.MOVE_CURRENT_CARD_LEFT:
+            return cardsListsFabric({
+                currentCard: state.currentCard - 1,
+                loadedCards: state.loadedCards,
+                lastPage: state.lastPage
+            })
+        case CARDSLIST_ACTIONS_TYPE.MOVE_CURRENT_CARD_RIGHT:
+            console.log(state)
+            return cardsListsFabric({
+                currentCard: state.currentCard + 1,
+                loadedCards: state.loadedCards,
+                lastPage: state.lastPage
             })
         default:
             return state 

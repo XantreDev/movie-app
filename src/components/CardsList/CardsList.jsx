@@ -1,45 +1,28 @@
-import React, { useRef, useState, useEffect, useLayoutEffect } from "react";
+import React from "react";
 import styles from "./CardsList.module.scss";
 import Card from "./../Card/Card";
-import { useBound } from './../../hooks/useBound';
-import { MoviesDataService } from "../../DataService/MoviesDataService";
-import {
-    getCachedCardsList,
-    isCachedCardsListExist,
-    updateCachedCardsList,
-    updateCachedCardsListCurrentIndex
-} from '../../local-storage/cacheCardsList';
-import { useDispatch, useSelector } from "react-redux";
-import { bindActionCreators } from "@reduxjs/toolkit";
-import { ActionCreators } from "../../state";
-import { grabCardsListFromCache } from '../../state/action-creaters';
+import { useCardsControl } from '../../hooks/useCardsControl';
+import { SIDES } from './../../hooks/useCardsControl';
 
 const CardsList = () => {
-    const cardsList = useSelector(state => state.cardsList)
-    const [newSlide, setNewSlide] = useState({})
 
-    const dispatch = useDispatch()
-    const setCardsList = bindActionCreators(ActionCreators, dispatch)
-
-    useEffect(_ => {
-        getCardsList()
-    }, [])
-
-    const getCardsList = async _ => {
-        if (isCachedCardsListExist()) {
-            grabCardsListFromCache()
-        } else {
-             
-        }
-    }
+    const [currentCard, moveCurrentCard] = useCardsControl(state => state.cardsList)
 
     return (
         <div
             // onLoad={_ => fetchSlides(1)}
-            ref={cardsListRef} 
-            onWheel={wheel => slideChange(wheel.deltaY)}
+            // ref={cardsListRef} 
+            onWheel={wheel => moveCurrentCard(wheel.deltaY > 0 ? SIDES.RIGHT : SIDES.LEFT) }
             className={styles.list}
         >
+            {
+                currentCard !== 'notInitialized' ?
+                    <Card {...currentCard}/>
+                    : <div>loading</div>
+            }
+                <div style={{display: "none"}}>
+                    
+                </div>
         </div>
     );
 };

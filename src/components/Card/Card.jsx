@@ -9,7 +9,7 @@ const Card = ({ title, rating, image, id, near, ...props }) => {
     const needToDrawUnmount = useRef(null) 
     const [videoId, setVideoId] = useState("")
 
-    const backgroundCssVariable = {"--background": `url(${image.highRes})`, "--background-blur": `url(${image.lowRes})`}
+    const backgroundCssVariable = {"--background": `url(${image.highRes})`, "--background-blur": `url(${image.highRes})`}
     const learnMoreVisibility = {
         "--before-visability": props.focus ? "visible" : "hidden"
     }

@@ -36,28 +36,41 @@ export const unsetNavigate = _ => {
     }
 }
 
-export const setCardsList = slide => {
+export const setLoadedMovies = movies => {
     return dispatch => {
         dispatch({
-            type: CARDSLIST_ACTIONS_TYPE.SET_CARDLIST,
-            payload: slide
+            type: CARDSLIST_ACTIONS_TYPE.SET_LOADED_MOVIES,
+            payload: movies
         })
     }
 }
+
+export const appendCardsListLeft = movies => {
+    return dispatch => {
+        dispatch({
+            type: CARDSLIST_ACTIONS_TYPE.APPEND_CARDSLIST_LEFT,
+            payload: movies
+        })
+    }
+}
+
+export const appendCardsListRight = movies => {
+    return dispatch => {
+            dispatch({
+                type: CARDSLIST_ACTIONS_TYPE.APPEND_CARDSLIST_RIGHT,
+                payload: movies
+        })
+    }
+}
+
+export const moveCurrentCardLeft = _ => dispatch => dispatch({ type: CARDSLIST_ACTIONS_TYPE.MOVE_CURRENT_CARD_LEFT })
+export const moveCurrentCardRight = _ => dispatch => dispatch({ type: CARDSLIST_ACTIONS_TYPE.MOVE_CURRENT_CARD_RIGHT })
+
 
 export const grabCardsListFromCache = _ => {
     return dispatch => {
         dispatch({
             type: CARDSLIST_ACTIONS_TYPE.GRAB_CARDSLIST_FROM_CACHE
-        })
-    }
-}
-
-export const loadCardsList = side => {
-    return dispatch => {
-        dispatch({
-            action: CARDSLIST_ACTIONS_TYPE.LOAD_CARDSLIST,
-            payload: side,
         })
     }
 }
