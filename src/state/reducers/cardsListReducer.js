@@ -1,8 +1,7 @@
 import {
     getCachedCardsList,
-    isCachedCardsListExist
 } from '../../local-storage/cacheCardsList';
-import { MoviesDataService } from '../../DataService/MoviesDataService';
+
 export const CARDSLIST_ACTIONS_TYPE = {
     SET_LOADED_MOVIES: 'setSlide',
     GRAB_CARDSLIST_FROM_CACHE: 'readSlideFromCache',
@@ -29,6 +28,8 @@ const cardsListsFabric = ({ currentCard, loadedCards, lastPage }) => {
 
 const cardsListReducer = (state = CARDLIST_OBJECT, action) => {
     switch (action.type) {
+        case CARDSLIST_ACTIONS_TYPE.SET_CARDS_LIST:
+            return action.payload
         case CARDSLIST_ACTIONS_TYPE.SET_LOADED_MOVIES:
             return cardsListsFabric({
                 ...state,
@@ -36,17 +37,12 @@ const cardsListReducer = (state = CARDLIST_OBJECT, action) => {
                 lastPage: 2
             })
         case CARDSLIST_ACTIONS_TYPE.GRAB_CARDSLIST_FROM_CACHE:
-            if (isCachedCardsListExist()) {
-                const { cachedMovies: loadedCards, cachedCurrentSlideIndex: currentCard, lastPageIndex } = getCachedCardsList()
-                return cardsListsFabric({
-                    loadedCards,
-                    currentCard,
-                    lastPage: lastPageIndex
-                })
-            }
-            else {
-                return CARDLIST_OBJECT
-            }
+            const { cachedMovies: loadedCards, cachedCurrentSlideIndex: currentCard, cachedLastPage } = getCachedCardsList()
+            return cardsListsFabric({
+                loadedCards,
+                currentCard,
+                lastPage: cachedLastPage
+            })
         case CARDSLIST_ACTIONS_TYPE.APPEND_CARDSLIST_LEFT:
             return cardsListsFabric({
                 currentCard: state.currentCard + action.payload.length,
@@ -66,7 +62,6 @@ const cardsListReducer = (state = CARDLIST_OBJECT, action) => {
                 lastPage: state.lastPage
             })
         case CARDSLIST_ACTIONS_TYPE.MOVE_CURRENT_CARD_RIGHT:
-            console.log(state)
             return cardsListsFabric({
                 currentCard: state.currentCard + 1,
                 loadedCards: state.loadedCards,

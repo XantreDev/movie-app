@@ -1,14 +1,18 @@
 @use "sass:math";
+@import './../constants.scss';
+
 $card-width-horizontal: min(70vw, 190rem);
 $card-min-height-vertical: 70vh;
 $card-aspect-ratio: math.div(16, 9);
 // $card-min-width: clamp(90rem, 50vw, 200rem);
-$card-border-radius: 2rem;
+$card-border-radius: 5.5rem;
+$card-border-color: #93806E66;
+
 $blur-size: 3.5rem;
 $title-font-size: max(1.5vw, 3.4vh);
-$rating-font-size: calc($title-font-size * 2);
 $learn-more-background-color: rgba(128, 128, 128, 0.4);
 $learn-more-font-size: calc(max(1.5vw, 3.4vh) * 3);
+
 
 @mixin fillCard {
     width: 100%;
@@ -21,21 +25,17 @@ $learn-more-font-size: calc(max(1.5vw, 3.4vh) * 3);
     height: calc($card-width-horizontal / $card-aspect-ratio);
     max-height: $card-min-height-vertical;
     border-radius: $card-border-radius;
-    // background-repeat: no-repeat;
-    // background-size: cover;
-    // background-position: center center;
-    // background-image: var(--background);
+
     display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    
-    gap: 0.2rem;
+    flex-direction: column;
+    justify-content: end;
+    align-items: center;
     color: white;
     font-size: 3rem;
     position: relative;
     transition: transform 1s ease-in-out;
     box-shadow: 0px 0px 25px rgba( 0, 0, 0, 0.4 );
-    border: 0.1rem solid rgba($color: #BBB, $alpha: 0.5);
+    border: 0.1rem solid $card-border-color;
     cursor: pointer;
 
 
@@ -50,41 +50,19 @@ $learn-more-font-size: calc(max(1.5vw, 3.4vh) * 3);
         // text-shadow: 1px 1px 50px black;
     }
 
-
-    .captionBlock{
-        z-index: 1;
-        min-width: 20%;
-        text-align: center;
-        padding-bottom: 3%;
-        padding-top: 2%;
-
-        // background-color: rgba($color: #999, $alpha: 0.4);
-        color: #eaeaea;
-        background: rgba(48, 213, 200, 0.4 );
-        // background: rgba( 255, 255, 255, 0.3 );
-        box-shadow: 0 -8px 32px 0 rgba( 31, 38, 135, 0.37 );
-        backdrop-filter: blur( 4px );
-        -webkit-backdrop-filter: blur( 4px );
-        border-radius: $card-border-radius 0 $card-border-radius 0;
-        border: 1px solid rgba( 255, 255, 255, 0.18 );
-        padding-right: 5%;
-        padding-left: 5%;
-    }
-    
     .title{
+        text-align: center;
+        background-color: rgba($accent-color, $alpha: .3) ;
         word-wrap: break-word;
-        font-family: "IBM Plex Serif", serif;
+        // font-family: $, serif;
+        font-family: $main-font;
         font-size: $title-font-size;
-        border-radius: 0px $card-border-radius 0 $card-border-radius;
+        border-radius: $card-border-radius;
+        width: 100%;
+        padding: 4.4rem 0;
+        color: #0D1110;
+        backdrop-filter: rgba(208, 206, 193, 0.3);;
     }
-    
-    .rating{
-
-        font-family: "Spline Sans", sans-serif;
-        font-size: $rating-font-size;
-        // font-weight: 300;
-    }
-
     
     @media (max-aspect-ratio: 1 / 1) {
         flex-wrap: wrap;
@@ -96,11 +74,6 @@ $learn-more-font-size: calc(max(1.5vw, 3.4vh) * 3);
             padding-top: 5%;
         }
         
-        .rating {
-            width: 100%;
-            border-radius: 0 0 $card-border-radius $card-border-radius;
-
-        }
     }
 
     .bluredImage{

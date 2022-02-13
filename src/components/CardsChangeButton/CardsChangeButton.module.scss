@@ -1,0 +1,15 @@
+@import './../constants.scss';
+
+.container{    
+    position: absolute;
+    width: clamp(5rem, 6.5625vw, 20rem);
+    cursor: pointer;
+    // overflow: visible;
+    backdrop-filter: drop-shadow($glassmorph-shadow-for-brown);
+
+    .button {
+        width: 100%;
+        position: absolute;
+        opacity: .5;
+    }
+}

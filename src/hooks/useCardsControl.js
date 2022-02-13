@@ -4,6 +4,8 @@ import { ActionCreators } from '../state';
 import { MoviesDataService } from '../DataService/MoviesDataService';
 import { useEffect } from 'react';
 import { useRef } from 'react';
+import { isCachedCardsListExist } from '../local-storage/cacheCardsList';
+import { updateCachedCardsListCurrentIndex, updateCachedCardsList } from './../local-storage/cacheCardsList';
 
 export const SIDES = {
     LEFT: 'left',
@@ -18,7 +20,7 @@ export const useCardsControl = (callback) => {
     const offset = 3;
     const { appendCardsListLeft, appendCardsListRight, 
             moveCurrentCardLeft, moveCurrentCardRight,
-            setLoadedMovies } = bindActionCreators(ActionCreators, dispatch)
+            setLoadedMovies, grabCardsListFromCache } = bindActionCreators(ActionCreators, dispatch)
 
     const notInOffset = (position, cards) => position < offset || position >= cards.loadedCards.length - offset ;
 
@@ -31,12 +33,30 @@ export const useCardsControl = (callback) => {
         })
     }
     
+    const isCardsListExist = _ => cardsList.loadedCards !== undefined && 
+                                  cardsList.currentCard !== undefined && 
+                                  cardsList.loadedCards[cardsList.currentCard] !== undefined
+    
+    useEffect(_ => {if (isCardsListExist()) updateCachedCardsListCurrentIndex({newCurrentIndex: cardsList.currentCard})}, [cardsList.currentCard])
+    useEffect(_ => {if (isCardsListExist()) 
+                            updateCachedCardsList({
+                                moviesList: cardsList.loadedCards, 
+                                lastPage: cardsList.lastPage, 
+                                newCurrentSlide: cardsList.currentCard
+                            })}, 
+                            [cardsList.loadedCards])
+
     useEffect(_ => {
-        MoviesDataService.getMoviesDiscoverPage(1)
-             .then(data => { 
-                setLoadedMovies(data)
-                isUpdating.current = false
-            })
+        if (isCachedCardsListExist()) {
+            grabCardsListFromCache()
+            isUpdating.current = false
+        }
+        else {
+            MoviesDataService.getMoviesDiscoverPage(1)
+                .then(data => { 
+                    setLoadedMovies(data)
+                    isUpdating.current = false
+            })}
     }, [])
     
     const isInBoundaries = (newIndex, cards) => newIndex >= 0 && newIndex < cards.loadedCards.length
@@ -53,9 +73,6 @@ export const useCardsControl = (callback) => {
     const isElementExist = index => (isInBoundaries(index, cardsList) && cardsList.loadedCards !== undefined && 
                               cardsList.loadedCards[index] !== undefined)
 
-    const isCardsListExist = _ => cardsList.loadedCards !== undefined && 
-                                  cardsList.currentCard !== undefined && 
-                                  cardsList.loadedCards[cardsList.currentCard] !== undefined
     
     const dataOrStatus =  !isCardsListExist() || !isElementExist(cardsList.currentCard)  
                             ? 'notInitialized'

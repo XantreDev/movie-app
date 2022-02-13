@@ -64,8 +64,7 @@ const Card = ({ title, rating, image, id, near, ...props }) => {
                 : ""
             }
             
-            <div className={`${styles.title} ${styles.captionBlock}`}>{title}</div>
-            <div className={`${styles.rating} ${styles.captionBlock}`}>{`${rating}`}</div>
+            <div className={`${styles.title}`}>{title}</div>
         </div>
     );
 };
