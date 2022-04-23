@@ -1,0 +1,24 @@
+$nav-height: max(8vh, 8rem);
+$input-color: rgba($color: #EEE, $alpha: 1);
+$input-font-size: clamp(1.4rem, 2.5vh, 2.5rem);
+$input-icon-size: calc($input-font-size * 1.4);
+$submit-button-hight: calc($input-font-size * 1.6);
+$submit-button-font-size: calc($input-font-size * 1.1);
+$input-font: "IBM Plex Sans Thai Looped", Arial, sans-serif;
+
+.nav {
+    z-index: 200;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    min-height: $nav-height;
+    
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    align-content: center;
+}
+
+
