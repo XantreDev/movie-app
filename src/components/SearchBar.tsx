@@ -24,6 +24,7 @@ const SearchRoot = styled.div<
   gap: 15px;
 
   border-radius: ${(props) => props.borderRadiuses.default};
+  z-index: 10;
 `;
 
 const SearchField = styled.input<typeof Styles>`
@@ -60,17 +61,14 @@ const SearchIcon = styled(searchIcon)<typeof Styles>`
 type SearchBarProps = {
   searchRequest: string,
   setSearchRequest: React.Dispatch<React.SetStateAction<string>>,
-  topOffset: number,
-  height: number
 }
 
 const SearchBar = ({
-  topOffset,
-  height,
   searchRequest,
   setSearchRequest,
 }: SearchBarProps) => {
   const style = useContext(styleContext);
+  const { searchHeight: height, searchTopOffset: topOffset } = style.dimmensions
   return (
     <SearchRoot top={topOffset} minHeight={height} {...style}>
       <SearchIcon {...style} />

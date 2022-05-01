@@ -1,7 +1,9 @@
 import axios from "axios";
 import dayjs from "dayjs";
 import { LoadedMovie } from "../types/movie";
-import { DataRest } from "../types/rest";
+import { MovieDetails } from "../types/movieDetails";
+import { MovieSearchData, MoviesSearchResultTransformed } from "../types/movieSearchResults";
+import { DataRest, Generes } from "../types/rest";
 import { generateBaseRequest } from "../utils/utils";
 
 export class MoviesDataService {
@@ -9,7 +11,7 @@ export class MoviesDataService {
         "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJjYTFkYzVkNjU0M2E5YzgzM2IxNDNhODc5MGVlOTk5NSIsInN1YiI6IjYxZjJlODA2OWEzYzQ5MDA0NDY5NDU4NCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.ZFB-6d11GjxbaPcH9IsJiTHo4e2IxxNspyF0MmDYpJU";
     static apiUrl = "https://api.themoviedb.org/3";
 
-    static baseMovieRequest = generateBaseRequest(this.apiUrl, this.apiKey)
+    private static baseMovieRequest = generateBaseRequest(this.apiUrl, this.apiKey)
 
     static async getTrendingMovies() {
         const contentType = "movies";
@@ -22,6 +24,15 @@ export class MoviesDataService {
 
         const moviesObject = this.transformResponseToMoviesObject(response);
         return moviesObject;
+    }
+
+    static getGeneres = async () => {
+      const result = (await axios({
+        ...this.baseMovieRequest,
+        method: 'get',
+        url: '/genre/movie/list'
+      })).data.genres as Generes
+      return result
     }
 
     // static async getTrendingMoviesIn
@@ -76,10 +87,27 @@ export class MoviesDataService {
         }
     }
 
-    static async getMoviesDiscoverPage(targetPage: number) {
+    private static getImageUrl = (path: string, quality: 'original' | 'medium' | 'crap') => {
+      switch (quality) {
+        case 'crap': {
+          return this.lowResImageUrl + path
+        } case 'medium': {
+          return this.middleResImageUrl + path
+        }
+        default: {
+          return this.highResImageUrl + path
+        }
+      }
+    }
+
+    static async getMoviesDiscoverPage(targetPage: number, genre?: Generes[0]) {
         const sortBy = "vote_count.desc";
 
         const discoverUrl = "/discover/movie";
+
+        const genreOptions = genre ? {
+          with_genres: `${genre.id}`
+        } : {}
 
         const response = (await axios({
             ...this.baseMovieRequest,
@@ -88,6 +116,7 @@ export class MoviesDataService {
             params: {
                 page: targetPage,
                 sort_by: sortBy,
+                ...genreOptions
             },
         })).data as DataRest;
         
@@ -122,6 +151,7 @@ export class MoviesDataService {
         if (movieVideos.data.results.length === undefined){
             return null
         }
+
         const movieVideo = movieVideos.data.results.filter(movieVideoInfo => movieVideoInfo.site === "YouTube")[0]
 
         if (movieVideo === undefined) {
@@ -132,17 +162,35 @@ export class MoviesDataService {
         
     }
 
-    static async findMovieByQuery(query) {
+    static findMovieByQuery = async (query: string): Promise<MoviesSearchResultTransformed[]> => {
         const movieFindUrl = '/search/movie'
-        const request = axios({
+        const result = (await axios({
             ...this.baseMovieRequest,
             url: movieFindUrl,
             params: {
                 query
             }
-        })
-        console.log(request)
-        const movieList = await request
-        return movieList.data.results
+        })).data as MovieSearchData
+
+        const { getImageUrl } = this
+
+        return result.results.map((data) => ({
+          ...data,
+          backdropUrl: getImageUrl(data.backdrop_path, 'medium'),
+          posterUrl: getImageUrl(data.poster_path, 'medium')
+        }))
+    }
+
+    static async getMovieDetails(movieId: number){
+        const movieDetailsUrl = `movie/${movieId}`
+        const result = (await axios({
+          ...this.baseMovieRequest,
+          url: movieDetailsUrl,
+          params: {
+            append_to_response: 'credits,reviews,similar,images'
+          }
+        })).data as MovieDetails
+
+        return result
     }
 }

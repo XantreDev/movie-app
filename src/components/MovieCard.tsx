@@ -10,12 +10,14 @@ import stopwatchIcon from "../svg/stopwatchIcon";
 import { LoadedMovie, Movie, ReleaseDate } from "../types/movie";
 
 const Card = styled(motion.article)<typeof Styles>`
+  z-index: 1;
   user-select: none;
   /* user-drag: none; */
   cursor: pointer;
+  pointer-events: all;
 
   border-radius: ${(props) => props.borderRadiuses.default};
-  background-color: ${({colors}) => colors.tint};
+  background-color: ${({ colors }) => colors.tint};
   inset: 0;
   position: absolute;
   overflow: hidden;
@@ -24,12 +26,18 @@ const Card = styled(motion.article)<typeof Styles>`
   flex-direction: column;
 
   align-items: flex-end;
-  justify-content: space-between;
+  justify-content: flex-end;
 
   box-shadow: 0px 6px 4px rgba(0, 0, 0, 0.3);
 
   img {
     user-drag: none;
+    -webkit-user-drag: none;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    pointer-events: none;
 
     position: absolute;
     width: 100%;
@@ -40,8 +48,8 @@ const Card = styled(motion.article)<typeof Styles>`
 `;
 
 const CardRating = styled.div<typeof Styles>`
-  margin: 24px 40px 0 0;
-  z-index: 1;
+  /* margin: 24px 40px 0 0; */
+  /* z-index: 1; */
   display: flex;
   gap: 2.5px;
   justify-content: center;
@@ -110,27 +118,27 @@ const TimerTime = styled.div<typeof Styles>`
 
 const CardInfo = styled.div<typeof Styles>`
   color: ${({ colors }) => colors.textBright};
+  max-width: calc(100% - 80px - 5px);
 `;
 const CardTitle = styled.h4<typeof Styles>`
   font-size: 24px;
   font-weight: 400;
   line-height: 28px;
-  text-align: center;
+  text-align: left;
+
+  text-overflow: ellipsis;
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
 `;
 const CardBirthday = styled.div<typeof Styles>`
   font-size: 14px;
   font-weight: 300;
   line-height: 17px;
+  display: inline;
 `;
 
-export type MovieCardProps = {
-  movieData: Movie;
-  position: CardPosition;
-  onClick: () => void;
-};
-
-
-const SkeletonContainer = styled.div<typeof Styles & {isFailed: boolean}>`
+const SkeletonContainer = styled.div<typeof Styles & { isFailed: boolean }>`
   width: 100%;
   height: 100%;
   display: flex;
@@ -138,11 +146,11 @@ const SkeletonContainer = styled.div<typeof Styles & {isFailed: boolean}>`
   position: relative;
 
   &::after {
-    display: ${props => props.isFailed ? "block" : "none"};
-    content: 'Loading failed :(';
+    display: ${(props) => (props.isFailed ? "block" : "none")};
+    content: "Loading failed :(";
     font-size: 36px;
     font-weight: 400;
-    color: ${({colors}) => colors.text};
+    color: ${({ colors }) => colors.text};
 
     position: absolute;
     left: 50%;
@@ -153,7 +161,7 @@ const SkeletonContainer = styled.div<typeof Styles & {isFailed: boolean}>`
     padding: 10px 20px;
     width: 100%; 
   } */
-`
+`;
 
 const variants = {
   left: { x: "-54vw", scale: 0.8 },
@@ -163,22 +171,27 @@ const variants = {
   righter: { x: `${54 * 2}vw`, scale: 0.6 },
 };
 
-const getFormattedReleaseDate = ({releaseDate : date}: LoadedMovie) => {
-  if (date === 'Unknown') return date
+const getFormattedReleaseDate = ({ releaseDate: date }: LoadedMovie) => {
+  if (date === "Unknown") return date;
 
-  return date.format("MMM YYYY")
-}
+  return date.format("MMM YYYY");
+};
+
+export type MovieCardProps = {
+  movieData: Movie;
+  position: CardPosition;
+  onClick: () => void;
+};
 
 const MovieCard = ({ position, movieData, onClick }: MovieCardProps) => {
-  
   const style = useContext(styleContext);
-  const { isLoading } = movieData
-  let isFailed: boolean
-  if ('isFailed' in movieData) {
-    isFailed = movieData.isFailed
+  const { isLoading } = movieData;
+  let isFailed: boolean;
+  if ("isFailed" in movieData) {
+    isFailed = movieData.isFailed;
   }
-  if (position === 'invisible') return <></>
-  
+  if (position === "invisible") return <></>;
+
   return (
     <Card
       variants={variants}
@@ -198,7 +211,7 @@ const MovieCard = ({ position, movieData, onClick }: MovieCardProps) => {
       {...style}
     >
       {(() => {
-        const isNeedToShowSkeleton = isFailed || isLoading
+        const isNeedToShowSkeleton = isFailed || isLoading;
         if (isNeedToShowSkeleton) {
           return (
             <SkeletonContainer {...style} isFailed={isFailed}>
@@ -217,27 +230,28 @@ const MovieCard = ({ position, movieData, onClick }: MovieCardProps) => {
             </SkeletonContainer>
           );
         }
-        const movieDataAsLoaded = movieData as LoadedMovie
+        const movieDataAsLoaded = movieData as LoadedMovie;
 
         return (
           <>
-            <img
-              src={movieDataAsLoaded.img}
-              alt=""
-            />
-            <CardRating {...style}>
-              <StarIcon />
-              <CardRatingText {...style}>{movieDataAsLoaded.rating}</CardRatingText>
-            </CardRating>
+            <img src={movieDataAsLoaded.img} alt="" />
             <CardBadge {...style}>
               <CardInfo {...style}>
                 <CardTitle {...style}>{movieDataAsLoaded.name}</CardTitle>
-                <CardBirthday {...style}>{getFormattedReleaseDate(movieDataAsLoaded)}</CardBirthday>
+                <CardBirthday {...style}>
+                  {getFormattedReleaseDate(movieDataAsLoaded)}
+                </CardBirthday>
               </CardInfo>
-              <CardTimer {...style}>
+              <CardRating {...style}>
+                <StarIcon />
+                <CardRatingText {...style}>
+                  {movieDataAsLoaded.rating}
+                </CardRatingText>
+              </CardRating>
+              {/* <CardTimer {...style}>
                 <StopwatchIcon />
                 <TimerTime {...style}>11:22</TimerTime>
-              </CardTimer>
+              </CardTimer> */}
             </CardBadge>
           </>
         );

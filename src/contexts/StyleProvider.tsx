@@ -13,6 +13,11 @@ export const Styles = {
     textBright: 'hsla(0, 0%, 100%, 1)',
     accent: 'hsla(24, 95%, 58%, 1)'
   },
+  dimmensions: {
+    searchHeight: 44,
+    searchTopOffset: 40,
+    searchCardsOffsetFromSearchBar: 76
+  }
 }
 
 export const styleContext = createContext(Styles)

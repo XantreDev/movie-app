@@ -5,6 +5,8 @@ export interface DataRest {
   total_results: number
 }
 
+export type Generes = {name: string, id: number}[]
+
 export interface MovieRest {
   genre_ids: number[]
   original_language: string
