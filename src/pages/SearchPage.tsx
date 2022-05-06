@@ -2,10 +2,12 @@ import { Skeleton } from "@mui/material";
 import { grey } from "@mui/material/colors";
 import { motion } from "framer-motion";
 import React, { useContext, useLayoutEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { styleContext, Styles } from "../contexts/StyleProvider";
 import starIcon from "../svg/starIcon";
 import { MoviesSearchRequest, MoviesSearchResult, MoviesSearchResultTransformed, RequestStatus } from "../types/movieSearchResults";
+import { getFormattedRating, redirectToMovie } from "../utils/utils";
 
 export type SearchPageProps = {
   data: MoviesSearchRequest
@@ -30,9 +32,9 @@ const SearchCardBadgeWrapper = styled.div<typeof Styles>`
   position: relative;
 
   backdrop-filter: blur(4px);
-  background-color: rgba(0 0 0 / .3);
   border-radius: ${({ borderRadiuses }) => borderRadiuses.cardBadge};
 
+  background-color: rgba(0 0 0 / .3);
   transition: transform 200ms ease-in-out;
   transform: translateY(calc(100% - 50px));
   *:hover > & {
@@ -55,6 +57,8 @@ const SearchCardBadgeWrapper = styled.div<typeof Styles>`
 
 const SearchCardBadge = styled.div<typeof Styles>`
   display: flex;
+  background-color: rgba(0 0 0 / .3);
+  border-radius: ${({ borderRadiuses }) => borderRadiuses.cardBadge};
   padding: 10px;
   gap: 15px;
   align-items: center;
@@ -151,6 +155,8 @@ const SearchPage = ({data}: SearchPageProps) => {
 
   const style = useContext(styleContext)
 
+  const navigate = useNavigate()
+
   return (
     <SearchContainer
       {...style}
@@ -164,9 +170,10 @@ const SearchPage = ({data}: SearchPageProps) => {
     >
       {cards.map((cardData, index) => (
         <SearchCard
+          onClick={() => data.status === RequestStatus.Finished ? redirectToMovie(navigate, cardData.id) : null}
           initial={{opacity: 0}}
           animate={{opacity: 1}}
-          exit={{opacity: 0}}
+          exit={{opacity: 0, transition: { duration: .1 }}}
           transition={{ type: 'tween' }}
         {...style} key={index}>
           {isNeedToShowLoader ? (
@@ -203,7 +210,7 @@ const SearchPage = ({data}: SearchPageProps) => {
                 <CardBadgeDivider/>
                 <RatingSection>
                   <StarIcon/>
-                  {cardData.vote_average.toString().includes('.') ? cardData.vote_average : `${cardData.vote_average}.0`}
+                  {getFormattedRating(cardData.vote_average)}
                 </RatingSection>
               </>)
             }

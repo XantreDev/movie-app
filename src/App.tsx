@@ -8,6 +8,7 @@ import StyleProvider, { styleContext, Styles } from "./contexts/StyleProvider";
 import { MoviesDataService } from "./DataService/MoviesDataService";
 import MainPage from "./pages/MainPage";
 import SearchPage from "./pages/SearchPage";
+import DetailsPage from "./pages/DetailsPage";
 import { MovieSearchData, MoviesSearchRequest, RequestStatus } from "./types/movieSearchResults";
 import { Paths } from './constants/paths'
 // import MainPage from "./pages/MainPage";
@@ -35,16 +36,17 @@ const Cursor = styled.div`
 
 const RootDiv = styled.div<typeof Styles & { path: Paths }>`
   width: 100vw;
+  background: ${(props) => props.colors.background};
   ${
     ({path}) => {
       if (path === Paths.Main) {
         return "height: 100vh;"
       }
-      return "min-height: 100vh;"
+      return "min-height: 100vh; background: #000;"
     }
   }
+  transition: background 100ms;
   
-  background: ${(props) => props.colors.background};
 `;
 
 const BodyStyle = createGlobalStyle<{path: Paths}>`
@@ -72,7 +74,13 @@ function App() {
   const navigate = useNavigate()
   const location = useLocation()
 
+  console.log(location.pathname)
+
   useEffect(() => {
+    if (searchRequest.length && location.pathname.includes(Paths.Details)){
+      setSearchRequest('')
+      return 
+    }
     if (searchRequest.length && location.pathname !== '/search') {
       navigate('/search')
     }
@@ -122,9 +130,10 @@ function App() {
               setSearchRequest={setSearchRequest}
             />
             <AnimatePresence exitBeforeEnter>
-              <Routes key={location.pathname}>
+              <Routes location={location} key={location.pathname}>
                 <Route key="main-route" path={`/${Paths.Main}`} element={<MainPage />} />
                 <Route key="search-route" path={`/${Paths.Search}`} element={<SearchPage data={searchResults} />} />
+                <Route key="film-details-route" path={`/${Paths.Details}/:movieId`} element={<DetailsPage />} />
               </Routes>
             </AnimatePresence>
           </RootDiv>

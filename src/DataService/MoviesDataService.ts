@@ -1,7 +1,7 @@
 import axios from "axios";
 import dayjs from "dayjs";
 import { LoadedMovie } from "../types/movie";
-import { MovieDetails } from "../types/movieDetails";
+import { MovieDetailsRest } from "../types/movieDetails";
 import { MovieSearchData, MoviesSearchResultTransformed } from "../types/movieSearchResults";
 import { DataRest, Generes } from "../types/rest";
 import { generateBaseRequest } from "../utils/utils";
@@ -37,7 +37,7 @@ export class MoviesDataService {
 
     // static async getTrendingMoviesIn
 
-    private static transformResponseToMoviesObject = (data: DataRest): LoadedMovie[] => (
+    private static transformResponseToMoviesObject = (data: DataRest): Omit<LoadedMovie, 'key'>[] => (
       data.results.map(value => ({
         isLoading: false,
         id: value.id,
@@ -87,7 +87,7 @@ export class MoviesDataService {
         }
     }
 
-    private static getImageUrl = (path: string, quality: 'original' | 'medium' | 'crap') => {
+    static getImageUrl = (path: string, quality: 'original' | 'medium' | 'crap') => {
       switch (quality) {
         case 'crap': {
           return this.lowResImageUrl + path
@@ -189,7 +189,7 @@ export class MoviesDataService {
           params: {
             append_to_response: 'credits,reviews,similar,images'
           }
-        })).data as MovieDetails
+        })).data as MovieDetailsRest
 
         return result
     }

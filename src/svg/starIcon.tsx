@@ -1,9 +1,10 @@
 import React from "react";
+import { IconProps } from "../types/props";
 
-function starIcon({className}: {className?: string}) {
+function starIcon(props: IconProps)  {
   return (
     <svg
-      className={className}
+      {...props}
       xmlns="http://www.w3.org/2000/svg"
       width="20"
       height="21"

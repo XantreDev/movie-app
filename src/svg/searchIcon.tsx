@@ -1,9 +1,10 @@
 import React from "react";
+import { IconProps } from "../types/props";
 
-function searchIcon({className}: {className?: string}) {
+function searchIcon(props: IconProps)  {
   return (
     <svg
-      className={className}
+      {...props}
       xmlns="http://www.w3.org/2000/svg"
       width="20"
       height="20"

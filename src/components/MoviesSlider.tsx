@@ -10,6 +10,7 @@ import { CardPosition } from "../pages/MainPage";
 import { MoviesDataLoaded } from "../types/context";
 import { Movie } from "../types/movie";
 import MovieCard from "./MovieCard";
+import { Keys } from "./../constants/keys"
 
 const ContentRoot = styled(motion.div)<typeof Styles & { topOffset: number, position: HorizontalPosition }>`
   position: absolute;
@@ -109,7 +110,10 @@ const MoviesSlider = ({ topOffset, data, position }: MoviesSliderProps) => {
           payload: {
             genre,
             loadStarted: currentTime,
-            movies,
+            movies: movies.map((movieData) => ({
+              ...movieData,
+              key: `${movieData.id}-${genre.id}`
+            }))
           },
         });
       } catch {
@@ -123,19 +127,21 @@ const MoviesSlider = ({ topOffset, data, position }: MoviesSliderProps) => {
               isLoading: false,
               id: currentTime.toISOString() + index,
               loadStarted: currentTime,
+              key: currentTime.toISOString() + index
             })),
           },
         });
       }
     })();
 
-    const tmp = Array.from(Array(oneBunchLoad)).map(
+    const tmp: Movie[] = Array.from(Array(oneBunchLoad)).map(
       (__, index) =>
         ({
           isLoading: true,
           id: currentTime.toISOString() + index,
           loadStarted: currentTime,
-        } as Movie)
+          key: currentTime.toISOString() + index
+        })
     );
 
     dispatch({
@@ -173,22 +179,28 @@ const MoviesSlider = ({ topOffset, data, position }: MoviesSliderProps) => {
   };
 
   useInputSlider(
-    () =>
-      dispatch({
-        type: "change-index",
-        payload: {
-          genre,
-          type: "increment",
-        },
-      }),
-    () =>
-      dispatch({
-        type: "change-index",
-        payload: {
-          genre,
-          type: "decriment",
-        },
-      })
+    {
+      key: Keys.ArrowRight,
+      callback: () =>
+        dispatch({
+          type: "change-index",
+          payload: {
+            genre,
+            type: "increment",
+          },
+        }),
+    },
+    {
+      key: Keys.ArrowLeft,
+      callback: () =>
+        dispatch({
+          type: "change-index",
+          payload: {
+            genre,
+            type: "decriment",
+          },
+        }),
+    }
   );
   const style = useContext(styleContext);
 
@@ -242,7 +254,7 @@ const MoviesSlider = ({ topOffset, data, position }: MoviesSliderProps) => {
                 },
               });
             }}
-            key={movieData.id}
+            key={movieData.key}
           />
         ))}
       </CardsContainer>

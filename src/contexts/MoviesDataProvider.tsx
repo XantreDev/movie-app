@@ -34,8 +34,8 @@ const reducer: React.Reducer<MoviesData, MoviesDataActions> = (
       }
       case "add-movies-at-row": {
         const { direction, genre, movies } = action.payload;
-        if (draftState.isGeneresLoading) return;
-        const realDraft = draftState as MoviesDataLoaded;
+        if (draftState.isGeneresLoading !== false) return;
+        const realDraft = draftState;
         const targetIndex = realDraft.data.findIndex(
           (value) => value.genre.id === genre.id
         );
@@ -50,8 +50,8 @@ const reducer: React.Reducer<MoviesData, MoviesDataActions> = (
         return;
       }
       case "set-loaded-movies": {
-        if (draftState.isGeneresLoading) return;
-        const realDraft = draftState as MoviesDataLoaded;
+        if (draftState.isGeneresLoading !== false) return;
+        const realDraft = draftState;
         const { genre, loadStarted, movies } = action.payload;
 
         const rowIndex = realDraft.data.findIndex(

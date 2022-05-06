@@ -1,33 +1,38 @@
 import React, { useEffect } from 'react'
 
-const useInputSlider = (increment: () => void, decriment: () => void) => {
+export type InputAction = {
+  callback: () => void,
+  key: string
+}
+
+const useInputSlider = (forwardAction: InputAction, backwardAction: InputAction) => {
   useEffect(() => {
     const listner = (() => {
       const keys = {
-        isArrowLeftPressed: false,
-        isArrowRightPressed: false,
+        isForwardPressed: false,
+        isBackwardPressed: false,
       };
       return {
         keydown: (event: React.KeyboardEvent) => {
           if (Object.values(keys).some((key) => !!key)) return;
-          if (event.key === "ArrowLeft") {
-            decriment();
-            keys.isArrowLeftPressed = true;
+          if (event.key === forwardAction.key) {
+            forwardAction.callback()
+            keys.isForwardPressed = true;
             return;
           }
-          if (event.key === "ArrowRight") {
-            increment()
-            keys.isArrowRightPressed = true;
+          if (event.key === backwardAction.key) {
+            backwardAction.callback()
+            keys.isBackwardPressed = true;
             return;
           }
         },
         keyup: (event: React.KeyboardEvent) => {
-          if (event.key === "ArrowLeft") {
-            keys.isArrowLeftPressed = false;
+          if (event.key === forwardAction.key) {
+            keys.isForwardPressed = false;
             return;
           }
-          if (event.key === "ArrowRight") {
-            keys.isArrowRightPressed = false;
+          if (event.key === backwardAction.key) {
+            keys.isBackwardPressed = false;
             return;
           }
         },

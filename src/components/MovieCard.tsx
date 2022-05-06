@@ -2,12 +2,15 @@ import { Skeleton } from "@mui/material";
 import { motion } from "framer-motion";
 import React from "react";
 import { useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { styleContext, Styles } from "../contexts/StyleProvider";
+import useCombineCallbacksByState from "../hooks/useCombineCallbacksByState";
 import { CardPosition } from "../pages/MainPage";
 import starIcon from "../svg/starIcon";
 import stopwatchIcon from "../svg/stopwatchIcon";
 import { LoadedMovie, Movie, ReleaseDate } from "../types/movie";
+import { getFormattedRating, redirectToMovie } from "../utils/utils";
 
 const Card = styled(motion.article)<typeof Styles>`
   z-index: 1;
@@ -190,7 +193,18 @@ const MovieCard = ({ position, movieData, onClick }: MovieCardProps) => {
   if ("isFailed" in movieData) {
     isFailed = movieData.isFailed;
   }
+  const navigate = useNavigate()
+  const handleClick = useCombineCallbacksByState([{
+    callback: () => redirectToMovie(navigate, movieData.id),
+    target: 'center',
+    isNeedToUse: !isLoading && !isFailed
+  }, {
+    callback: onClick
+  }], position)
+
   if (position === "invisible") return <></>;
+
+
 
   return (
     <Card
@@ -207,7 +221,7 @@ const MovieCard = ({ position, movieData, onClick }: MovieCardProps) => {
         velocity: 1.8,
       }}
       initial={false}
-      onClick={onClick}
+      onClick={handleClick}
       {...style}
     >
       {(() => {
@@ -245,7 +259,7 @@ const MovieCard = ({ position, movieData, onClick }: MovieCardProps) => {
               <CardRating {...style}>
                 <StarIcon />
                 <CardRatingText {...style}>
-                  {movieDataAsLoaded.rating}
+                  {getFormattedRating(movieDataAsLoaded.rating)}
                 </CardRatingText>
               </CardRating>
               {/* <CardTimer {...style}>

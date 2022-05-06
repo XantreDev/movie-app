@@ -1,4 +1,12 @@
-export interface MovieDetails {
+import { RequestStatus } from './movieSearchResults';
+export type MovieDetails = {
+  status: RequestStatus.Error | RequestStatus.Loading
+} | {
+  status: RequestStatus.Finished,
+  data: MovieDetailsRest
+}
+
+export interface MovieDetailsRest {
   adult:                 boolean;
   backdrop_path:         string;
   belongs_to_collection: BelongsToCollection;

@@ -11,7 +11,12 @@ export const Styles = {
     transparentText: 'hsla(0, 0%, 100%, 0.8)',
     text: 'hsla(0, 0%, 100%, .95)',
     textBright: 'hsla(0, 0%, 100%, 1)',
-    accent: 'hsla(24, 95%, 58%, 1)'
+    accent: 'hsla(24, 95%, 58%, 1)',
+    reviewCards: {
+      good: "hsla(97, 20%, 16%, 1)",
+      bad: "hsla(360, 20%, 16%, 1)",
+      none: "hsla(0, 0%, 16%, 1)"
+    }
   },
   dimmensions: {
     searchHeight: 44,

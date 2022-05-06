@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
-import React, { useContext, useState, useEffect, useRef, useCallback } from "react";
+import React, { useContext, useState, useEffect, useRef, useCallback, useMemo } from "react";
 import styled, { AnyStyledComponent, StyledComponent } from "styled-components";
 import SearchBar from "../components/SearchBar";
 import { styleContext, Styles } from "../contexts/StyleProvider";
@@ -15,6 +15,8 @@ import useInputSlider from "../hooks/useInputSlider";
 import { moviesDataContext } from "../contexts/MoviesDataProvider";
 import { MoviesDataLoaded } from "../types/context";
 import MoviesSlider, { HorizontalPosition } from "../components/MoviesSlider";
+import { Keys } from "../constants/keys";
+import { transitionProps } from "../constants/props";
 
 
 const ArrowDownIcon = styled(arrowDownIcon)`
@@ -111,33 +113,32 @@ export type CardPosition =
   
 const MainPage = () => {
   const style = useContext(styleContext);
-
-
   const { searchTopOffset, searchHeight } = style.dimmensions
 
   const data = useContext(moviesDataContext);
   const { isGeneresLoading } = data;
-    
+
   const [rowIndex, setRowIndex] = useState(0);
   const canChangeRowTo = useCallback((index: number) => {
     return data.isGeneresLoading === false && data.data.length > index && index >= 0
   }, [data]);
     
-  // const [centerIndex, setCenterIndex] = useState(10)
+  const { rowIncrease, rowDecrease } = useMemo(() => ({
+    rowDecrease: () => setRowIndex((index) => canChangeRowTo(index - 1) ? index - 1 : index),
+    rowIncrease: () => setRowIndex((index) => canChangeRowTo(index + 1) ? index + 1 : index),
+  }), [canChangeRowTo])
 
-  // const [moviesData, setMoviesData] = useState<Movie[]>([])
-
-  const [isInvisible, setIsInvivible] = useState(false);
+  useInputSlider({
+    key: Keys.ArrowDown,
+    callback: rowIncrease
+  }, {
+    key: Keys.ArrowUp,
+    callback: rowDecrease
+  })
 
   return (
       <motion.div 
-        initial={{opacity: 0}}
-        animate={{opacity: 1}}
-        exit={{ opacity: 0 }}
-        transition={{
-          type: 'spring',
-          stiffness: 30,
-        }}
+        {...transitionProps}
       >
       {isGeneresLoading === false && (
         <>
@@ -165,14 +166,14 @@ const MainPage = () => {
           )}
           <Navigation>
             <Button
-              onClick={() => setRowIndex((index) => canChangeRowTo(index - 1) ? index - 1 : index)}
+              onClick={rowDecrease}
               data-is-invisible={!canChangeRowTo(rowIndex - 1)}
               {...style}
             >
               <ArrowUpIcon />{" "}
             </Button>
             <Button
-              onClick={() => setRowIndex((index) => canChangeRowTo(index + 1) ? index + 1 : index)}
+              onClick={rowIncrease}
               data-is-invisible={!canChangeRowTo(rowIndex + 1)}
               {...style}
             >

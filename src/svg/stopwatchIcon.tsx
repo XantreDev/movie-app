@@ -1,14 +1,15 @@
 import React from "react";
+import { IconProps } from "../types/props";
 
-function stopwatchIcon({className}: {className?: string}) {
+function stopwatchIcon(props: IconProps)  {
   return (
     <svg
-      className={className}
       xmlns="http://www.w3.org/2000/svg"
       width="23"
       height="22"
       fill="none"
       viewBox="0 0 23 22"
+      {...props}
     >
       <path
         fill="#000"

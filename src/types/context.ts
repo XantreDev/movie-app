@@ -12,7 +12,7 @@ export type MoviesDataLoaded = {
     genre: Generes[0];
     currentCenter: number;
     movies: Movie[];
-    lastPage: number
+    lastPage: number,
   }[];
 }
 
