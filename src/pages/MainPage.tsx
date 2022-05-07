@@ -2,7 +2,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import React, { useContext, useState, useEffect, useRef, useCallback, useMemo } from "react";
 import styled, { AnyStyledComponent, StyledComponent } from "styled-components";
 import SearchBar from "../components/SearchBar";
-import { styleContext, Styles } from "../contexts/StyleProvider";
+import { Styles } from "../contexts/StyleProvider";
 import searchIcon from "../svg/searchIcon";
 import arrowDownIcon from "../svg/arrowDownIcon";
 import starIcon from "../svg/starIcon";
@@ -17,6 +17,7 @@ import { MoviesDataLoaded } from "../types/context";
 import MoviesSlider, { HorizontalPosition } from "../components/MoviesSlider";
 import { Keys } from "../constants/keys";
 import { transitionProps } from "../constants/props";
+import { Helmet } from 'react-helmet-async'
 
 
 const ArrowDownIcon = styled(arrowDownIcon)`
@@ -39,7 +40,7 @@ const ArrowUpIcon = styled(ArrowDownIcon)`
 //   position: relative;
 // `
 
-const Button = styled.div<typeof Styles>`
+const Button = styled.div`
   position: relative;
   overflow: hidden;
   padding: 9px 0;
@@ -48,13 +49,13 @@ const Button = styled.div<typeof Styles>`
   align-items: center;
   width: 50px;
   height: 80px;
-  border-radius: ${(props) => props.borderRadiuses.default};
+  border-radius: ${(props) => props.theme.borderRadiuses.default};
 
   opacity: 1;
 
   box-shadow: 0px 4px 6px 0px #0000001a;
 
-  background: ${(props) => props.colors.tint};
+  background: ${(props) => props.theme.colors.tint};
   cursor: pointer;
 
   transition: opacity 300ms, height 0ms 0ms, width 0ms 0ms;
@@ -75,7 +76,7 @@ const Button = styled.div<typeof Styles>`
     inset: -50px;
     transform-origin: center center;
     transform: rotate(45deg) translateX(-100%);
-    background: ${(props) => props.colors.accent};
+    background: ${(props) => props.theme.colors.accent};
 
     transition: transform 0.5s ease-in-out;
   }
@@ -112,9 +113,6 @@ export type CardPosition =
 
   
 const MainPage = () => {
-  const style = useContext(styleContext);
-  const { searchTopOffset, searchHeight } = style.dimmensions
-
   const data = useContext(moviesDataContext);
   const { isGeneresLoading } = data;
 
@@ -137,52 +135,54 @@ const MainPage = () => {
   })
 
   return (
-      <motion.div 
-        {...transitionProps}
-      >
-      {isGeneresLoading === false && (
-        <>
-          {rowIndex - 1 >= 0 && (
+      <>
+        <Helmet>
+          <title>Movies explorer</title>
+        </Helmet>
+        <motion.div 
+          {...transitionProps}
+        >
+        {isGeneresLoading === false && (
+          <>
+            {rowIndex - 1 >= 0 && (
+              <MoviesSlider
+                key={data.data[rowIndex - 1].genre.id}
+                position={"top" as HorizontalPosition}
+                data={data.data[rowIndex - 1]}
+              />
+            )}
             <MoviesSlider
-              key={data.data[rowIndex - 1].genre.id}
-              position={"top" as HorizontalPosition}
-              data={data.data[rowIndex - 1]}
-              topOffset={searchHeight + searchTopOffset}
+              key={data.data[rowIndex].genre.id}
+              position={"center" as HorizontalPosition}
+              data={data.data[rowIndex]}
             />
-          )}
-          <MoviesSlider
-            key={data.data[rowIndex].genre.id}
-            position={"center" as HorizontalPosition}
-            data={data.data[rowIndex]}
-            topOffset={searchHeight + searchTopOffset}
-          />
-          {rowIndex + 1 < data.data.length && (
-            <MoviesSlider
-              key={data.data[rowIndex + 1].genre.id}
-              position={"bottom"}
-              data={data.data[rowIndex + 1]}
-              topOffset={searchHeight + searchTopOffset}
-            />
-          )}
-          <Navigation>
-            <Button
-              onClick={rowDecrease}
-              data-is-invisible={!canChangeRowTo(rowIndex - 1)}
-              {...style}
-            >
-              <ArrowUpIcon />{" "}
-            </Button>
-            <Button
-              onClick={rowIncrease}
-              data-is-invisible={!canChangeRowTo(rowIndex + 1)}
-              {...style}
-            >
-              <ArrowDownIcon />
-            </Button>
-          </Navigation>
-        </>
-      )}
-      </motion.div>
+            {rowIndex + 1 < data.data.length && (
+              <MoviesSlider
+                key={data.data[rowIndex + 1].genre.id}
+                position={"bottom"}
+                data={data.data[rowIndex + 1]}
+              />
+            )}
+            <Navigation>
+              <Button
+                onClick={rowDecrease}
+                data-is-invisible={!canChangeRowTo(rowIndex - 1)}
+                
+              >
+                <ArrowUpIcon />{" "}
+              </Button>
+              <Button
+                onClick={rowIncrease}
+                data-is-invisible={!canChangeRowTo(rowIndex + 1)}
+                
+              >
+                <ArrowDownIcon />
+              </Button>
+            </Navigation>
+          </>
+        )}
+        </motion.div>
+      </>
   );
 };
 

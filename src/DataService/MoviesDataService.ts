@@ -22,7 +22,7 @@ export class MoviesDataService {
             url: `/trending/${contentType}/${timeWindow}`,
         });
 
-        const moviesObject = this.transformResponseToMoviesObject(response);
+        const moviesObject = this.transformResponseToMoviesObject(response as any);
         return moviesObject;
     }
 

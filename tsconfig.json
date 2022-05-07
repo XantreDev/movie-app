@@ -1,0 +1,11 @@
+{
+    "compilerOptions": {
+        "allowJs": true,
+        "sourceMap": true,
+        "module": "CommonJS",
+        "jsx": "react",
+        "allowSyntheticDefaultImports": true,
+        "target": "ES5",
+        "checkJs": true,
+    }
+}

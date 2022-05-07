@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import React, { useContext, useEffect, useRef } from "react";
 import styled from "styled-components";
 import { moviesDataContextDispatch } from "../contexts/MoviesDataProvider";
-import { styleContext, Styles } from "../contexts/StyleProvider";
+import { Styles } from "../contexts/StyleProvider";
 import { MoviesDataService } from "../DataService/MoviesDataService";
 import useInputSlider from "../hooks/useInputSlider";
 import { CardPosition } from "../pages/MainPage";
@@ -12,7 +12,7 @@ import { Movie } from "../types/movie";
 import MovieCard from "./MovieCard";
 import { Keys } from "./../constants/keys"
 
-const ContentRoot = styled(motion.div)<typeof Styles & { topOffset: number, position: HorizontalPosition }>`
+const ContentRoot = styled(motion.div)`
   position: absolute;
   left: 0;
   right: 0;
@@ -21,19 +21,9 @@ const ContentRoot = styled(motion.div)<typeof Styles & { topOffset: number, posi
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding-top: ${(props) => props.topOffset}px;
+  padding-top: ${({ theme: { dimmensions: {searchHeight, searchTopOffset} } }) => searchHeight + searchTopOffset}px;
   overflow: hidden;
   pointer-events: none;
-  /* z-index: ${props => {
-    switch (props.position){
-      case 'top':
-      case 'bottom': {
-        return -1
-      }
-      default:
-        return 1
-    }
-  }}; */
 `;
 
 const ContainerStyle = `
@@ -41,7 +31,7 @@ const ContainerStyle = `
   margin: 0 auto;
 `;
 
-const ContentGenreTitle = styled(motion.h2)<typeof Styles>`
+const ContentGenreTitle = styled(motion.h2)`
   ${ContainerStyle}
 
   user-select: none;
@@ -49,10 +39,10 @@ const ContentGenreTitle = styled(motion.h2)<typeof Styles>`
   font-weight: 600;
   line-height: 6.6rem;
 
-  color: ${({ colors }) => colors.accent};
+  color: ${({ theme: { colors }}) => colors.accent};
 `;
 
-const CardsContainer = styled(motion.main)<typeof Styles>`
+const CardsContainer = styled(motion.main)`
   ${ContainerStyle}
 
   height: 57vh;
@@ -65,12 +55,11 @@ const CardsContainer = styled(motion.main)<typeof Styles>`
 export type HorizontalPosition = "top" | "center" | "bottom";
 
 type MoviesSliderProps = {
-  topOffset: number;
   data: MoviesDataLoaded["data"][0];
   position: HorizontalPosition;
 }
 
-const MoviesSlider = ({ topOffset, data, position }: MoviesSliderProps) => {
+const MoviesSlider = ({ data, position }: MoviesSliderProps) => {
   const { currentCenter: centerIndex, movies: moviesData, genre } = data;
 
   const offset = 5;
@@ -202,11 +191,8 @@ const MoviesSlider = ({ topOffset, data, position }: MoviesSliderProps) => {
         }),
     }
   );
-  const style = useContext(styleContext);
-
   return (
     <ContentRoot
-      position={position}
       initial={false}
       animate={position}
       variants={{
@@ -233,12 +219,10 @@ const MoviesSlider = ({ topOffset, data, position }: MoviesSliderProps) => {
         stiffness: 200,
         velocity: 1.8,
       }}
-      {...style}
-      topOffset={topOffset}
     >
-      <ContentGenreTitle {...style}>{genre.name}:</ContentGenreTitle>
+      <ContentGenreTitle >{genre.name}:</ContentGenreTitle>
 
-      <CardsContainer {...style}>
+      <CardsContainer >
         {moviesData.map((movieData, index) => (
           <MovieCard
             position={getPosition(index)}

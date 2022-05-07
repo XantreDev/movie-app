@@ -4,17 +4,14 @@ import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import styled, { createGlobalStyle } from "styled-components";
 import SearchBar from "./components/SearchBar";
 import MoviesDataProvider from "./contexts/MoviesDataProvider";
-import StyleProvider, { styleContext, Styles } from "./contexts/StyleProvider";
+import StyleProvider from "./contexts/StyleProvider";
 import { MoviesDataService } from "./DataService/MoviesDataService";
 import MainPage from "./pages/MainPage";
 import SearchPage from "./pages/SearchPage";
 import DetailsPage from "./pages/DetailsPage";
 import { MovieSearchData, MoviesSearchRequest, RequestStatus } from "./types/movieSearchResults";
+import { HelmetProvider } from "react-helmet-async";
 import { Paths } from './constants/paths'
-// import MainPage from "./pages/MainPage";
-// import { ActionCreators } from "./state";
-// import SearchPage from "./pages/SearchPage";
-
 
 
 const Cursor = styled.div`
@@ -34,12 +31,12 @@ const Cursor = styled.div`
 `
 
 
-const RootDiv = styled.div<typeof Styles & { path: Paths }>`
+const RootDiv = styled.div<{ path: Paths }>`
   width: 100vw;
-  background: ${(props) => props.colors.background};
+  background: ${(props) => props.theme.colors.background};
   ${
     ({path}) => {
-      if (path === Paths.Main) {
+      if (path.includes(Paths.Main)) {
         return "height: 100vh;"
       }
       return "min-height: 100vh; background: #000;"
@@ -60,88 +57,38 @@ const BodyStyle = createGlobalStyle<{path: Paths}>`
 function App() {
   const cursorRef = useRef<HTMLDivElement>()
 
-  // useEffect(() => {
-  //   document.addEventListener('mousemove', (event) => {
-  //     // cursorRef.current.style.transform = `translate(${event.x}, ${event.y});`
-  //     cursorRef.current.style.left = `${event.pageX}px` 
-  //     cursorRef.current.style.top = `${event.pageY}px`
-  //     // cursorRef.current.style.top = `100px;`
-  //   })
-  // }, [])
-  const style = useContext(styleContext)
-  const [searchRequest, setSearchRequest] = useState("");
-
   const navigate = useNavigate()
-  const location = useLocation()
+  const location = useLocation() ?? {pathname: ''}
 
-  console.log(location.pathname)
+  const locationPath = useMemo(() => {
+    if (location.pathname.includes(Paths.Details)) return Paths.Details
+    if (location.pathname.includes(Paths.Search)) return Paths.Search
+    return Paths.Main
+  }, [location]) as Paths
 
-  useEffect(() => {
-    if (searchRequest.length && location.pathname.includes(Paths.Details)){
-      setSearchRequest('')
-      return 
-    }
-    if (searchRequest.length && location.pathname !== '/search') {
-      navigate('/search')
-    }
-    if (!searchRequest.length && location.pathname === '/search') {
-      navigate('/')
-    }
-  }, [searchRequest, location])
-
-  const [searchResults, setSearchResults] = useState<MoviesSearchRequest>({ status: RequestStatus.Loading })
-
-  useEffect(() => {
-    const currentRequest = searchRequest;
-    if (!searchRequest.length){
-      return
-    }
-
-    (async () => {
-      try {
-        setSearchResults({status: RequestStatus.Loading})
-        const result = await MoviesDataService.findMovieByQuery(searchRequest)
-        if (searchRequest !== currentRequest) {
-          return;
-        }
-        setSearchResults({
-          data: result,
-          status: RequestStatus.Finished
-        })
-      } catch {
-        setSearchResults({
-          status: RequestStatus.Error
-        })
-      }
-    })()
-  }, [searchRequest])
-
-  const locationPath = useMemo(() => location.pathname.slice(1), [location]) as Paths
-    
   return (
     <>
-      <BodyStyle path={locationPath}/>
-      <div className="App">
-      <StyleProvider>
-        <MoviesDataProvider>
-          <RootDiv path={locationPath} {...style}>
-            <SearchBar
-              searchRequest={searchRequest}
-              setSearchRequest={setSearchRequest}
-            />
-            <AnimatePresence exitBeforeEnter>
-              <Routes location={location} key={location.pathname}>
-                <Route key="main-route" path={`/${Paths.Main}`} element={<MainPage />} />
-                <Route key="search-route" path={`/${Paths.Search}`} element={<SearchPage data={searchResults} />} />
-                <Route key="film-details-route" path={`/${Paths.Details}/:movieId`} element={<DetailsPage />} />
-              </Routes>
-            </AnimatePresence>
-          </RootDiv>
-        </MoviesDataProvider>
-      </StyleProvider>
-    </div>
-    {/* <div id="cursor" ref={cursorRef}></div> */}
-    {/* <Cursor ref={cursorRef}></Cursor> */}
+      <HelmetProvider>
+        <BodyStyle path={locationPath}/>
+        <div className="App">
+        <StyleProvider>
+          <MoviesDataProvider>
+            <RootDiv path={locationPath} >
+              <SearchBar/>
+              <AnimatePresence exitBeforeEnter>
+                <Routes location={location} key={locationPath}>
+                  <Route key="main-route" path={`/${Paths.Main}`} element={<MainPage />} />
+                  <Route key="search-route" path={`/${Paths.Search}/:searchQuery`} element={<SearchPage />} />
+                  <Route key="film-details-route" path={`/${Paths.Details}/:movieId`} element={<DetailsPage />} />
+                </Routes>
+              </AnimatePresence>
+            </RootDiv>
+          </MoviesDataProvider>
+        </StyleProvider>
+            </div>
+            {/* <div id="cursor" ref={cursorRef}></div> */}
+            {/* <Cursor ref={cursorRef}></Cursor> */}
+      </HelmetProvider>
     </>
   );
 }

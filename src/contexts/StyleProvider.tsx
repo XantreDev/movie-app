@@ -1,4 +1,5 @@
 import React, { createContext, useState } from 'react'
+import { ThemeProvider } from 'styled-components' 
 
 export const Styles = {
   borderRadiuses: {
@@ -25,17 +26,15 @@ export const Styles = {
   }
 }
 
-export const styleContext = createContext(Styles)
-
 const StyleProvider = ({children}: React.PropsWithChildren<{}>) => {
   const [styles, setStyles] = useState(Styles)
   
   return (
-    <styleContext.Provider
-      value={styles}
-    >{
-      children
-      }</styleContext.Provider>
+    <ThemeProvider
+      theme={styles}
+    >
+      {children}
+    </ThemeProvider>
   )
 }
 

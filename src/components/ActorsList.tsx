@@ -1,5 +1,4 @@
 import React, { useCallback, useContext, useMemo, useState } from "react";
-import useStyleContext from "../hooks/useStyleContext";
 import { ActorsListProps } from "../types/props";
 import { MoviesDataService } from "../DataService/MoviesDataService";
 import styled from "styled-components";
@@ -7,10 +6,11 @@ import { Styles } from "../contexts/StyleProvider";
 import rightArrowIcon from "../svg/rightArrowIcon";
 import leftArrowIcon from "../svg/leftArrowIcon";
 import { motion, Variant, Variants } from "framer-motion";
+import { getGoogleUrl } from "../utils/utils";
 
 const { getImageUrl } = MoviesDataService;
 
-const Actors = styled.section<typeof Styles>`
+const Actors = styled.section`
   width: 100%;
   font-size: 20px;
   font-weight: 600;
@@ -18,7 +18,7 @@ const Actors = styled.section<typeof Styles>`
   color: white;
 `;
 
-const ActorsContainer = styled.div<typeof Styles>`
+const ActorsContainer = styled.div`
   display: flex;
   width: 100%;
   justify-content: space-between;
@@ -28,11 +28,13 @@ const ActorsContainer = styled.div<typeof Styles>`
   gap: 10px;
 `;
 
-const ActorCard = styled(motion.li)<typeof Styles>`
+const ActorCard = styled(motion.li)`
   position: absolute;
   top: 0;
   left: 0;
   width: calc((100% - 10px * 3) / 4);
+
+  user-select: none;
 
   @media screen and (max-width: 600px) {
     width: calc((100% - 10px * 2) / 3);
@@ -48,7 +50,7 @@ const ActorCard = styled(motion.li)<typeof Styles>`
   padding: 10px;
 `;
 
-const ActorCardImage = styled.img<typeof Styles>`
+const ActorCardImage = styled.img`
   object-fit: cover;
   object-position: center;
   aspect-ratio: 1 / 1;
@@ -70,13 +72,13 @@ const ActorCardImage = styled.img<typeof Styles>`
       right: 0;
       bottom: 0;
       width: 100%;
-      background: ${props => props.colors.tint};
+      background: ${props => props.theme.colors.tint};
       border-radius: inherit;
     }
   }
 `;
 
-const ActorCardName = styled.p<typeof Styles>`
+const ActorCardName = styled.p`
   display: -webkit-box;
   -webkit-box-orient: vertical;
   text-overflow: ellipsis;
@@ -132,7 +134,6 @@ const variation: {[key in VariationKeys]: Variant} = {
 }
 
 const ActorsList = ({ data }: ActorsListProps) => {
-  const style = useStyleContext();
   const cast = useMemo(() => data.credits.cast, [data])
 
   const [leftElement, setLeftElement] = useState(0)
@@ -143,27 +144,39 @@ const ActorsList = ({ data }: ActorsListProps) => {
   }, [leftElement])
 
   return (
-    <Actors {...style}>
+    <Actors >
       <div style={{ marginLeft: "20px" }}>Actors</div>
-      <ActorsContainer {...style}>
+      <ActorsContainer >
         <LeftArrow onClick={() => setLeftElement(value => value > 0 ? value - 1 : value)}/>
         <ActorsCardsContainer>
           {
             cast.map((value, index) => (
               <ActorCard 
                 key={value.id} 
-                {...style}
+                
+                // initial={false}
                 animate={getPlace(index).toString()}
                 variants={variation}
               >
-                <ActorCardImage
-                  onError={(ev) => {
-                    (ev.target as HTMLImageElement)?.setAttribute?.('data-error', 'true')
+                <a
+                  style={{
+                    display: 'contents',
+                    color: 'inherit'
                   }}
-                  {...style}
-                  src={getImageUrl(value.profile_path, "medium")}
-                />
-                <ActorCardName {...style}>{value.name}</ActorCardName>
+                  href={getGoogleUrl(value.name)}
+                  rel='noreferrer'
+                  target='_blank'
+                >
+                  <ActorCardImage
+                    onError={(ev) => {
+                      (ev.target as HTMLImageElement)?.setAttribute?.('data-error', 'true')
+                    }}
+                    
+                    src={getImageUrl(value.profile_path, "medium")}
+                  />
+                  <ActorCardName >{value.name}</ActorCardName>
+
+                </a>
               </ActorCard>
             ))
           }

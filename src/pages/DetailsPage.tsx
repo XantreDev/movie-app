@@ -2,7 +2,6 @@ import dayjs from 'dayjs'
 import React, { useContext, useEffect, useState } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
 import styled from 'styled-components'
-import { styleContext, Styles } from '../contexts/StyleProvider'
 import { MoviesDataService } from '../DataService/MoviesDataService'
 import starIcon from '../svg/starIcon'
 import leftArrowIcon from '../svg/leftArrowIcon'
@@ -18,17 +17,18 @@ import { transitionProps } from '../constants/props'
 import useLazyBackgroundImage from '../hooks/useLazyBackgroundImage'
 import ReactMarkdown from 'react-markdown'
 import ActorsList from '../components/ActorsList'
+import { Helmet } from 'react-helmet-async'
 
-const DetailsContainer = styled(motion.div)<typeof Styles>`
+const DetailsContainer = styled(motion.div)`
 
   max-width: min(1200px, 90%);
   margin: 0 auto;
-  padding-top: ${({
+  padding-top: ${({theme: {
     dimmensions: {
       searchHeight,
       searchTopOffset,
       searchCardsOffsetFromSearchBar,
-    },
+    }},
   }) => searchHeight + searchTopOffset + searchCardsOffsetFromSearchBar}px;
   /* min-height: 100vh; */
   min-height: 100vh;
@@ -37,10 +37,10 @@ const DetailsContainer = styled(motion.div)<typeof Styles>`
   position: relative;
 `
 
-const DetailsRoot = styled.article<typeof Styles>`
+const DetailsRoot = styled.article`
   flex: 1 0 100%;
 
-  background-color: ${({colors}) => colors.background};
+  background-color: ${({ theme: { colors } }) => colors.background};
   width: 100%;
   padding: 80px;
 
@@ -49,17 +49,16 @@ const DetailsRoot = styled.article<typeof Styles>`
   }
 
   height: 100%;
-  /* background-color: ${({colors}) => "white"}; */
-  border-radius: ${({borderRadiuses}) => Array(2).fill(borderRadiuses.default).join(" ")} 0 0;
+  border-radius: ${({ theme: { borderRadiuses }}) => Array(2).fill(borderRadiuses.default).join(" ")} 0 0;
 `
 
-const DetailsFlexRows = styled.div<typeof Styles>`
+const DetailsFlexRows = styled.div`
   display: flex;
   flex-direction: column;
   gap: 20px; 
 `
 
-const DetailsFlexColumns = styled.div<typeof Styles>`
+const DetailsFlexColumns = styled.div`
   display: flex;
   gap: 40px;
   justify-content: space-between;
@@ -71,12 +70,12 @@ const DetailsFlexColumns = styled.div<typeof Styles>`
   }
 `
 
-const Poster = styled(motion.div)<typeof Styles & {imageUrl: string}>`
+const Poster = styled(motion.div)<{imageUrl: string}>`
   user-select: none;
   height: 660px;
   width: 528px;
   max-width: 100%;
-  border-radius: ${({borderRadiuses}) => borderRadiuses.default};
+  border-radius: ${({ theme: { borderRadiuses }}) => borderRadiuses.default};
 
   @media screen and (max-width: 900px){
     width: 100%;
@@ -89,8 +88,8 @@ const Poster = styled(motion.div)<typeof Styles & {imageUrl: string}>`
   position: relative;
 `
 
-const Rating = styled.div<typeof Styles>`
-  background-color: ${({ colors }) => colors.accent };
+const Rating = styled.div`
+  background-color: ${({ theme: { colors } }) => colors.accent };
   position: absolute;
   padding: 8px 12px;
   right: 8px;
@@ -100,7 +99,7 @@ const Rating = styled.div<typeof Styles>`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-radius: ${props => props.borderRadiuses.default};
+  border-radius: ${props => props.theme.borderRadiuses.default};
 
   color: white;
   font-size: 25px;
@@ -113,7 +112,7 @@ const StarIcon = styled(starIcon)<{size: number}>`
   height: ${props => props.size}px;
 `
 
-const Details = styled.div<typeof Styles>`
+const Details = styled.div`
   display: flex;
   max-width: 420px;
   @media screen and (max-width: 900px){
@@ -124,7 +123,7 @@ const Details = styled.div<typeof Styles>`
   gap: 20px;
 `
 
-const Title = styled.h1<typeof Styles>`
+const Title = styled.h1`
   font-size: 48px;
   font-weight: 700;
   line-height: 57px;
@@ -132,22 +131,23 @@ const Title = styled.h1<typeof Styles>`
   text-overflow: ellipsis;
 `
 
-const AdditionalInfo = styled.div<typeof Styles>`
+const AdditionalInfo = styled.div`
   display: flex;
   justify-content: space-between;
   gap: 30px;
 `
 
-const MetaInfo = styled.div<typeof Styles>`
+const MetaInfo = styled.div`
   display: flex;
   gap: 10px;
   align-items: center;
   font-size: 15px;
   font-weight: 300;
   line-height: 18px;
+  flex-shrink: 0;
 `
 
-const Generes = styled.div<typeof Styles>`
+const Generes = styled.div`
   display: flex;
   gap: 15px;
   overflow: hidden;
@@ -156,7 +156,7 @@ const Generes = styled.div<typeof Styles>`
   justify-content: right;
 `
 
-const GenereCard = styled.a<typeof Styles>`
+const GenereCard = styled.a`
   display: block;
   font-size: 14px;
   font-weight: 300;
@@ -169,18 +169,18 @@ const GenereCard = styled.a<typeof Styles>`
   flex: 0 1 33%;
 
   padding: 5px;
-  border: 1px solid ${({colors}) => colors.accent};
+  border: 1px solid ${({ theme:{ colors } }) => colors.accent};
   border-radius: 5px;
 `
 
-const Overview = styled.p<typeof Styles>`
+const Overview = styled.p`
   font-size: 16px;
   font-weight: 400;
   line-height: 26px;
   color: white;
 `
 
-const Images = styled.section<typeof Styles>`
+const Images = styled.section`
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -191,7 +191,7 @@ const Images = styled.section<typeof Styles>`
   padding: 10px 0;
 `
 
-const ImagesContainer = styled.div<typeof Styles>`
+const ImagesContainer = styled.div`
   display: flex;
   width: 100%;
   justify-content: space-between;
@@ -202,16 +202,16 @@ const ImagesContainer = styled.div<typeof Styles>`
   }
 `
 
-const ImageRect = styled.img<typeof Styles>`
+const ImageRect = styled.img`
   object-fit: cover;
   overflow: hidden;
   object-position: center;
   width: 100%;
   /* aspect-ratio: 1 / 1; */
-  border-radius: ${({ borderRadiuses }) => borderRadiuses.cardBadge};
+  border-radius: ${({ theme: { borderRadiuses }}) => borderRadiuses.cardBadge};
 `
 
-const Reviews = styled.section<typeof Styles>`
+const Reviews = styled.section`
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -222,13 +222,13 @@ const Reviews = styled.section<typeof Styles>`
   font-weight: 700;
   line-height: 38px;
 `
-const QuoteIcon = styled(quoteIcon)<typeof Styles>`
+const QuoteIcon = styled(quoteIcon)`
   top: 0;
   transform: translateY(calc(-50%));
   position: absolute;
 `
 
-const ReviewCards = styled.div<typeof Styles>`
+const ReviewCards = styled.div`
   display: flex;
   width: 100%;
   flex-wrap: wrap;
@@ -240,14 +240,14 @@ const ReviewCards = styled.div<typeof Styles>`
   }
 `
 
-const ReviewCard = styled.article<typeof Styles & {rating?: number}>`
+const ReviewCard = styled.article<{rating?: number}>`
   background-color: ${props => {
-    if (!props?.rating) return props.colors.reviewCards.none
-    if (props?.rating <= 5) return props.colors.reviewCards.bad
-    return props.colors.reviewCards.good
+    if (!props?.rating) return props.theme.colors.reviewCards.none
+    if (props?.rating <= 5) return props.theme.colors.reviewCards.bad
+    return props.theme.colors.reviewCards.good
   }};
   padding: 10px 20px;
-  border-radius: ${props => props.borderRadiuses.cardBadge};
+  border-radius: ${props => props.theme.borderRadiuses.cardBadge};
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -256,13 +256,13 @@ const ReviewCard = styled.article<typeof Styles & {rating?: number}>`
   position: relative;
 `
 
-const ReviewHeader = styled.div<typeof Styles>`
+const ReviewHeader = styled.div`
   display: flex;
   justify-content: space-between;
   padding: 10px 0;
 `
 
-const ReviewerName = styled.h4<typeof Styles>`
+const ReviewerName = styled.h4`
   font-family: "IBM Plex Mono", monospace;
   font-size: 17px;
   font-weight: 700;
@@ -270,7 +270,7 @@ const ReviewerName = styled.h4<typeof Styles>`
 `
 
 
-const ReviewRating = styled.span<typeof Styles>`
+const ReviewRating = styled.span`
   display: flex;
   gap: 3px;
   justify-content: space-between;
@@ -280,7 +280,7 @@ const ReviewRating = styled.span<typeof Styles>`
   line-height: 19px;
   text-align: center;
 `
-const ReviewText = styled.div<typeof Styles>`
+const ReviewText = styled.div`
   display: -webkit-box;
   -webkit-line-clamp: 6;
   -webkit-box-orient: vertical;  
@@ -294,7 +294,7 @@ const ReviewText = styled.div<typeof Styles>`
   text-overflow: -o-ellipsis-lastline;
 `
 
-const BackgroundImage = styled(motion.div)<typeof Styles & { backgroundUrl: string, isLoaded: boolean }>`
+const BackgroundImage = styled(motion.div)<{ backgroundUrl: string, isLoaded: boolean }>`
   position: fixed;
   top: 0;
   right: 0;
@@ -345,8 +345,6 @@ const DetailsPage = () => {
     })()
   }, [])
 
-  const style = useContext(styleContext)
-
   const { getImageUrl } = MoviesDataService;
 
   const [isLoaded, backgroundUrl] = useLazyBackgroundImage(
@@ -369,16 +367,19 @@ const DetailsPage = () => {
  
   return (
     <>
+    <Helmet>
+      <title>{details.data.title}</title>
+    </Helmet>
     <BackgroundImage      
-        {...style}
+        
         isLoaded={isLoaded}
         backgroundUrl={backgroundUrl}
         exit={{opacity: 0, transition: {duration: .2}}}
       />
-      <DetailsContainer initial={{opacity: 0}} animate={{opacity: 1}} exit={{opacity: 0, transition: {duration: .2}}} {...style}>
-        <DetailsRoot {...style}>
-          <DetailsFlexRows {...style}>
-            <DetailsFlexColumns {...style}>
+      <DetailsContainer initial={{opacity: 0}} animate={{opacity: 1}} exit={{opacity: 0, transition: {duration: .2}}} >
+        <DetailsRoot>
+          <DetailsFlexRows >
+            <DetailsFlexColumns >
               <Poster
                 initial={{opacity: 0}}
                 variants={{
@@ -390,40 +391,39 @@ const DetailsPage = () => {
 
                 exit={{opacity: 0, transition: {duration: .2}}}
                 imageUrl={posterUrl}
-
-                {...style}
               >
-                <Rating {...style}>
+                <Rating >
                   <StarIcon size={16.5} />
                   {getFormattedRating(details.data.vote_average)}
                 </Rating>
               </Poster>
-              <Details {...style}>
-                <Title {...style}>{details.data.title}</Title>
-                <AdditionalInfo {...style}>
-                  <MetaInfo {...style}>
+              <Details >
+                <Title >{details.data.title}</Title>
+                <AdditionalInfo >
+                  <MetaInfo >
                     <div>{dayjs(details.data.release_date).year()}</div>
                     <div>{formatRutime(details.data.runtime)}</div>
                   </MetaInfo>
-                  <Generes {...style}>
+                  <Generes >
                     {details.data.genres.map((genreDetails) => (
-                      <GenereCard {...style} key={genreDetails.id}>
+                      <GenereCard  key={genreDetails.id}>
                         {genreDetails.name}
                       </GenereCard>
                     ))}
                   </Generes>
                 </AdditionalInfo>
-                <Overview {...style}>{details.data.overview}</Overview>
-                <Images {...style}>
+                <Overview >{details.data.overview}</Overview>
+                <Images >
                   Images
-                  <ImagesContainer {...style}>
+                  <ImagesContainer >
                     {details.data.images.backdrops.slice(0, 3).map((image) => (
                       <Zoom
                         overlayBgColorEnd='rgba(255 255 255 / .5)'
                         zoomMargin={40}
+                        key={image.file_path}
                       >
                         <ImageRect
-                          {...style}
+                          
                           src={getImageUrl(image.file_path, "original")}
                         />
                       </Zoom>
@@ -433,22 +433,22 @@ const DetailsPage = () => {
                 <ActorsList data={details.data} />
               </Details>
             </DetailsFlexColumns>
-            <Reviews {...style}>
+            <Reviews >
               Reviews
-              <ReviewCards {...style}>
+              <ReviewCards >
                 {details.data.reviews.results.slice(0, 3).map((review) => (
-                  <ReviewCard rating={review?.author_details?.rating} {...style}>
-                    <QuoteIcon {...style} />
-                    <ReviewHeader {...style}>
-                      <ReviewerName {...style}>{review.author}</ReviewerName>
+                  <ReviewCard rating={review?.author_details?.rating} >
+                    <QuoteIcon  />
+                    <ReviewHeader >
+                      <ReviewerName >{review.author}</ReviewerName>
                       {review.author_details.rating && (
-                        <ReviewRating {...style}>
+                        <ReviewRating >
                           <StarIcon size={11} />
                           {getFormattedRating(review.author_details.rating)}
                         </ReviewRating>
                       )}
                     </ReviewHeader>
-                    <ReviewText {...style}>
+                    <ReviewText >
                       <ReactMarkdown>
                         {review.content}
                       </ReactMarkdown>

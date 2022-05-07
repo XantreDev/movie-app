@@ -14,3 +14,5 @@ export const redirectToMovie = (navigate: NavigateFunction, movieId: string | nu
 export const getFormattedRating = (rating: string | number) => rating.toString().includes('.') ? rating : `${rating}.0`
 
 export const formatRutime = (runtime: number) => `${Math.floor(runtime / 60)}h ${runtime % 60}`
+
+export const getGoogleUrl = (query: string) => `https://www.google.com/search?q=${query}`

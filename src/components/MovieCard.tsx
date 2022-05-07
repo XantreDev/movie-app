@@ -4,7 +4,6 @@ import React from "react";
 import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { styleContext, Styles } from "../contexts/StyleProvider";
 import useCombineCallbacksByState from "../hooks/useCombineCallbacksByState";
 import { CardPosition } from "../pages/MainPage";
 import starIcon from "../svg/starIcon";
@@ -12,15 +11,15 @@ import stopwatchIcon from "../svg/stopwatchIcon";
 import { LoadedMovie, Movie, ReleaseDate } from "../types/movie";
 import { getFormattedRating, redirectToMovie } from "../utils/utils";
 
-const Card = styled(motion.article)<typeof Styles>`
+const Card = styled(motion.article)`
   z-index: 1;
   user-select: none;
   /* user-drag: none; */
   cursor: pointer;
   pointer-events: all;
 
-  border-radius: ${(props) => props.borderRadiuses.default};
-  background-color: ${({ colors }) => colors.tint};
+  border-radius: ${({ theme: { borderRadiuses }}) => borderRadiuses.default};
+  background-color: ${({ theme:{ colors } }) => colors.tint};
   inset: 0;
   position: absolute;
   overflow: hidden;
@@ -50,7 +49,7 @@ const Card = styled(motion.article)<typeof Styles>`
   }
 `;
 
-const CardRating = styled.div<typeof Styles>`
+const CardRating = styled.div`
   /* margin: 24px 40px 0 0; */
   /* z-index: 1; */
   display: flex;
@@ -58,7 +57,7 @@ const CardRating = styled.div<typeof Styles>`
   justify-content: center;
   align-items: center;
   min-width: 70px;
-  color: ${({ colors }) => colors.textBright};
+  color: ${({ theme: { colors } }) => colors.textBright};
 
   font-size: 3rem;
   font-weight: 300;
@@ -72,18 +71,18 @@ const StarIcon = styled(starIcon)`
   height: 20px;
 `;
 
-const CardRatingText = styled.div<typeof Styles>``;
+const CardRatingText = styled.div``;
 
-const CardBadge = styled.div<typeof Styles>`
+const CardBadge = styled.div`
   z-index: 1;
   background: hsla(0, 0%, 0%, 0.3);
   backdrop-filter: blur(10px);
   width: 100%;
   min-height: 80px;
   padding: 0 40px;
-  border-radius: ${({ borderRadiuses }) => borderRadiuses.cardBadge};
+  border-radius: ${({ theme: { borderRadiuses }}) => borderRadiuses.cardBadge};
 
-  color: ${({ colors }) => colors.textBright};
+  color: ${({ theme:{ colors } }) => colors.textBright};
 
   display: flex;
   justify-content: space-between;
@@ -95,8 +94,8 @@ const StopwatchIcon = styled(stopwatchIcon)`
   height: 22px;
 `;
 
-const CardTimer = styled.div<typeof Styles>`
-  background: ${({ colors }) => colors.textBright};
+const CardTimer = styled.div`
+  background: ${({ theme:{ colors } }) => colors.textBright};
   height: 32px;
   width: 78px;
   display: flex;
@@ -109,21 +108,21 @@ const CardTimer = styled.div<typeof Styles>`
   align-items: center;
 `;
 
-const TimerTime = styled.div<typeof Styles>`
+const TimerTime = styled.div`
   font-style: normal;
   font-weight: 400;
   font-size: 15px;
   line-height: 18px;
   letter-spacing: 0.05em;
 
-  color: ${({ colors }) => colors.background};
+  color: ${({ theme:{ colors } }) => colors.background};
 `;
 
-const CardInfo = styled.div<typeof Styles>`
-  color: ${({ colors }) => colors.textBright};
+const CardInfo = styled.div`
+  color: ${({ theme: { colors } }) => colors.textBright};
   max-width: calc(100% - 80px - 5px);
 `;
-const CardTitle = styled.h4<typeof Styles>`
+const CardTitle = styled.h4`
   font-size: 24px;
   font-weight: 400;
   line-height: 28px;
@@ -134,14 +133,14 @@ const CardTitle = styled.h4<typeof Styles>`
   overflow: hidden;
   white-space: nowrap;
 `;
-const CardBirthday = styled.div<typeof Styles>`
+const CardBirthday = styled.div`
   font-size: 14px;
   font-weight: 300;
   line-height: 17px;
   display: inline;
 `;
 
-const SkeletonContainer = styled.div<typeof Styles & { isFailed: boolean }>`
+const SkeletonContainer = styled.div<{ isFailed: boolean }>`
   width: 100%;
   height: 100%;
   display: flex;
@@ -153,7 +152,7 @@ const SkeletonContainer = styled.div<typeof Styles & { isFailed: boolean }>`
     content: "Loading failed :(";
     font-size: 36px;
     font-weight: 400;
-    color: ${({ colors }) => colors.text};
+    color: ${({ theme:{ colors } }) => colors.text};
 
     position: absolute;
     left: 50%;
@@ -187,7 +186,6 @@ export type MovieCardProps = {
 };
 
 const MovieCard = ({ position, movieData, onClick }: MovieCardProps) => {
-  const style = useContext(styleContext);
   const { isLoading } = movieData;
   let isFailed: boolean;
   if ("isFailed" in movieData) {
@@ -222,13 +220,13 @@ const MovieCard = ({ position, movieData, onClick }: MovieCardProps) => {
       }}
       initial={false}
       onClick={handleClick}
-      {...style}
+      
     >
       {(() => {
         const isNeedToShowSkeleton = isFailed || isLoading;
         if (isNeedToShowSkeleton) {
           return (
-            <SkeletonContainer {...style} isFailed={isFailed}>
+            <SkeletonContainer  isFailed={isFailed}>
               <Skeleton
                 sx={{ bgcolor: "grey.900" }}
                 animation="wave"
@@ -249,22 +247,22 @@ const MovieCard = ({ position, movieData, onClick }: MovieCardProps) => {
         return (
           <>
             <img src={movieDataAsLoaded.img} alt="" />
-            <CardBadge {...style}>
-              <CardInfo {...style}>
-                <CardTitle {...style}>{movieDataAsLoaded.name}</CardTitle>
-                <CardBirthday {...style}>
+            <CardBadge >
+              <CardInfo >
+                <CardTitle >{movieDataAsLoaded.name}</CardTitle>
+                <CardBirthday >
                   {getFormattedReleaseDate(movieDataAsLoaded)}
                 </CardBirthday>
               </CardInfo>
-              <CardRating {...style}>
+              <CardRating >
                 <StarIcon />
-                <CardRatingText {...style}>
+                <CardRatingText >
                   {getFormattedRating(movieDataAsLoaded.rating)}
                 </CardRatingText>
               </CardRating>
-              {/* <CardTimer {...style}>
+              {/* <CardTimer >
                 <StopwatchIcon />
-                <TimerTime {...style}>11:22</TimerTime>
+                <TimerTime >11:22</TimerTime>
               </CardTimer> */}
             </CardBadge>
           </>

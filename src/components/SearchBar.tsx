@@ -1,20 +1,19 @@
 import React, { useContext } from 'react'
 import { useEffect } from 'react';
 import { useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { styleContext, Styles } from '../contexts/StyleProvider';
+import { Paths } from '../constants/paths';
 import searchIcon from '../svg/searchIcon';
 
-const SearchRoot = styled.div<
-  typeof Styles & { minHeight: number; top: number }
->`
+const SearchRoot = styled.div`
   max-width: min(760px, 80vw);
   width: 100%;
-  min-height: ${(props) => props.minHeight ?? 44}px;
-  background: ${(props) => props.colors.tint};
+  min-height: ${(props) => props.theme.dimmensions.searchHeight ?? 44}px;
+  background: ${(props) => props.theme.colors.tint};
 
   position: absolute;
-  top: ${props => props.top}px;
+  top: ${props => props.theme.dimmensions.searchTopOffset}px;
   left: 50%;
   transform: translateX(-50%);
   padding: 8px 24px 8px 24px;
@@ -23,11 +22,11 @@ const SearchRoot = styled.div<
   align-items: center;
   gap: 15px;
 
-  border-radius: ${(props) => props.borderRadiuses.default};
+  border-radius: ${({ theme: { borderRadiuses }}) => borderRadiuses.default};
   z-index: 10;
 `;
 
-const SearchField = styled.input<typeof Styles>`
+const SearchField = styled.input`
   outline: none;
   border: none;
   background: none;
@@ -36,10 +35,10 @@ const SearchField = styled.input<typeof Styles>`
   font-weight: 500;
   font-size: 2rem;
   line-height: 2.37rem;
-  color: ${props => props.colors.text};
+  color: ${props => props.theme.colors.text};
 
   &::placeholder {
-    color: ${props => props.colors.transparentText};
+    color: ${props => props.theme.colors.transparentText};
   }
 
   &::-webkit-search-cancel-button {
@@ -49,31 +48,45 @@ const SearchField = styled.input<typeof Styles>`
   }
 `
 
-const SearchIcon = styled(searchIcon)<typeof Styles>`
+const SearchIcon = styled(searchIcon)`
   width: 2rem;
   height: 2rem;
   & * {
-    fill: ${props => props.colors.transparentText}
+    fill: ${props => props.theme.colors.transparentText}
   }
 `
 
 
 type SearchBarProps = {
-  searchRequest: string,
-  setSearchRequest: React.Dispatch<React.SetStateAction<string>>,
 }
 
-const SearchBar = ({
-  searchRequest,
-  setSearchRequest,
-}: SearchBarProps) => {
-  const style = useContext(styleContext);
-  const { searchHeight: height, searchTopOffset: topOffset } = style.dimmensions
+const SearchBar = ({}: SearchBarProps) => {
+  const navigate = useNavigate()
+  const [searchRequest, setSearchRequest] = useState('')
+  const location = useLocation()
+
+  useEffect(() => {
+    if (searchRequest.length) {
+      navigate(`/${Paths.Search}/${searchRequest}`, {
+        replace: location.pathname.includes(Paths.Search)
+      })
+      return
+    }
+
+    navigate(-1)
+  }, [searchRequest])
+
+  useEffect(() => {
+    if (location.pathname.includes(Paths.Details)){
+      setSearchRequest('')
+    }
+  }, [location])
+
   return (
-    <SearchRoot top={topOffset} minHeight={height} {...style}>
-      <SearchIcon {...style} />
+    <SearchRoot>
+      <SearchIcon  />
       <SearchField
-        {...style}
+        
         type="search"
         placeholder="Search"
         value={searchRequest}
