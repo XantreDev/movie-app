@@ -18,6 +18,7 @@ import MoviesSlider, { HorizontalPosition } from "../components/MoviesSlider";
 import { Keys } from "../constants/keys";
 import { transitionProps } from "../constants/props";
 import { Helmet } from 'react-helmet-async'
+import NotificationsProvider, { notificationContext } from "../components/NotificationsProvider";
 
 
 const ArrowDownIcon = styled(arrowDownIcon)`

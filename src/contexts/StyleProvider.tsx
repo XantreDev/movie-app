@@ -17,6 +17,9 @@ export const Styles = {
       good: "hsla(97, 20%, 16%, 1)",
       bad: "hsla(360, 20%, 16%, 1)",
       none: "hsla(0, 0%, 16%, 1)"
+    },
+    modalContainer: {
+      background: "background: hsla(0, 0%, 0%, 0.3)",
     }
   },
   dimmensions: {

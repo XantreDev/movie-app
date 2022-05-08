@@ -11,6 +11,7 @@ import { MoviesDataLoaded } from "../types/context";
 import { Movie } from "../types/movie";
 import MovieCard from "./MovieCard";
 import { Keys } from "./../constants/keys"
+import { notificationContext } from "./NotificationsProvider";
 
 const ContentRoot = styled(motion.div)`
   position: absolute;
@@ -80,6 +81,8 @@ const MoviesSlider = ({ data, position }: MoviesSliderProps) => {
   };
   const targetPageRef = useRef<number>(1);
 
+  const notificationDispatch = useContext(notificationContext)
+
   useEffect(() => {
     const whereLoad = whereNeedToLoadData();
 
@@ -106,6 +109,14 @@ const MoviesSlider = ({ data, position }: MoviesSliderProps) => {
           },
         });
       } catch {
+        notificationDispatch({
+          type: 'append-notification',
+          payload: {
+            duration: 5,
+            id: +dayjs(),
+            text: "Some feed movies loaded with error"
+          }
+        })
         dispatch({
           type: "set-loaded-movies",
           payload: {

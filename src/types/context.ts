@@ -61,3 +61,41 @@ export type MoviesDataActions =
   | UpdateMovieByIdAndGenreAction
   | AddMoviesAtGenreRowAction
   | IncrementOrDecrimentIndexAction;
+
+
+export type NotificationState = {
+  text: string,
+  duration: number,
+  id: number,
+}[]
+
+type AppendNotificationAction = {
+  type: 'append-notification',
+  payload: NotificationState[0]
+}
+
+type RemoveNotificationById = {
+  type: 'remove-notification',
+  payload: NotificationState[0]['id']
+}
+
+export type NotificationActions = AppendNotificationAction | RemoveNotificationById
+
+export type ModalState = {
+  showModal: false 
+} | {
+  showModal: true,
+  modal: JSX.Element,
+  key: number
+}
+
+type OpenModalAction = {
+  type: 'open-modal',
+  payload: JSX.Element
+}
+
+type CloseModalAction = {
+  type: 'close-modal'
+}
+
+export type ModalActions = OpenModalAction | CloseModalAction

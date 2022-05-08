@@ -18,6 +18,10 @@ import useLazyBackgroundImage from '../hooks/useLazyBackgroundImage'
 import ReactMarkdown from 'react-markdown'
 import ActorsList from '../components/ActorsList'
 import { Helmet } from 'react-helmet-async'
+import { Skeleton } from '@mui/material'
+import { notificationContext } from '../components/NotificationsProvider'
+import { modalContext } from '../components/ModalProvider'
+import ReviewModal from '../components/ReviewModal'
 
 const DetailsContainer = styled(motion.div)`
 
@@ -246,6 +250,7 @@ const ReviewCard = styled.article<{rating?: number}>`
     if (props?.rating <= 5) return props.theme.colors.reviewCards.bad
     return props.theme.colors.reviewCards.good
   }};
+  cursor: pointer;
   padding: 10px 20px;
   border-radius: ${props => props.theme.borderRadiuses.cardBadge};
   display: flex;
@@ -321,29 +326,43 @@ const BackgroundImage = styled(motion.div)<{ backgroundUrl: string, isLoaded: bo
   }
 `
 
-const DetailsPage = () => {
-  const { movieId } = useParams<{movieId: string}>()
+const CustomSkeleton = styled(Skeleton)`
+  flex: 1 0 100%;
+  border-radius: ${({ theme: { borderRadiuses }}) => Array(2).fill(borderRadiuses.default).join(" ")} 0 0;
+`
 
-  const [details, setDetails] = useState<MovieDetails>({ status: RequestStatus.Loading })
+const DetailsPage = () => {
+  const { movieId } = useParams<{ movieId: string }>();
+
+  const [details, setDetails] = useState<MovieDetails>({
+    status: RequestStatus.Loading,
+  });
+
+  const notificationDispatch = useContext(notificationContext)
 
   useEffect(() => {
     (async () => {
       try {
-
-        const data = await MoviesDataService.getMovieDetails(parseInt(movieId))
+        const data = await MoviesDataService.getMovieDetails(parseInt(movieId));
         setDetails({
           status: RequestStatus.Finished,
-          data
+          data,
+        });
+      } catch {
+        notificationDispatch({
+          type: 'append-notification',
+          payload: {
+            id: +dayjs(),
+            duration: 5,
+            text: "Page load failed, check your internet connection"
+          }
         })
-      }
-      catch {
         setDetails({
-          status: RequestStatus.Error
-        })
+          status: RequestStatus.Error,
+        });
       }
-
-    })()
-  }, [])
+    })();
+  }, []);
 
   const { getImageUrl } = MoviesDataService;
 
@@ -356,112 +375,143 @@ const DetailsPage = () => {
   const [isPosterLoaded, posterUrl] = useLazyBackgroundImage(
     details?.status !== RequestStatus.Finished
       ? ""
-      : getImageUrl(
-        details.data.images.posters[0].file_path,
-        "original"
-      )
+      : getImageUrl(details?.data?.images?.posters?.[0]?.file_path, "original")
   );
 
+  const dispatchModal = useContext(modalContext)
 
-  if (details.status !== RequestStatus.Finished) return;
- 
   return (
     <>
-    <Helmet>
-      <title>{details.data.title}</title>
-    </Helmet>
-    <BackgroundImage      
-        
+      <Helmet>
+        <title>
+          {details.status !== RequestStatus.Finished
+            ? "Loading"
+            : details.data.title}
+        </title>
+      </Helmet>
+      <BackgroundImage
         isLoaded={isLoaded}
         backgroundUrl={backgroundUrl}
-        exit={{opacity: 0, transition: {duration: .2}}}
+        exit={{ opacity: 0, transition: { duration: 0.2 } }}
       />
-      <DetailsContainer initial={{opacity: 0}} animate={{opacity: 1}} exit={{opacity: 0, transition: {duration: .2}}} >
-        <DetailsRoot>
-          <DetailsFlexRows >
-            <DetailsFlexColumns >
-              <Poster
-                initial={{opacity: 0}}
-                variants={{
-                  isNotLoaded: {opacity: 0},
-                  isLoaded: {opacity: 1}
-                }}
-
-                animate={isPosterLoaded ? 'isLoaded' : 'isNotLoaded'}
-
-                exit={{opacity: 0, transition: {duration: .2}}}
-                imageUrl={posterUrl}
-              >
-                <Rating >
-                  <StarIcon size={16.5} />
-                  {getFormattedRating(details.data.vote_average)}
-                </Rating>
-              </Poster>
-              <Details >
-                <Title >{details.data.title}</Title>
-                <AdditionalInfo >
-                  <MetaInfo >
-                    <div>{dayjs(details.data.release_date).year()}</div>
-                    <div>{formatRutime(details.data.runtime)}</div>
-                  </MetaInfo>
-                  <Generes >
-                    {details.data.genres.map((genreDetails) => (
-                      <GenereCard  key={genreDetails.id}>
-                        {genreDetails.name}
-                      </GenereCard>
-                    ))}
-                  </Generes>
-                </AdditionalInfo>
-                <Overview >{details.data.overview}</Overview>
-                <Images >
-                  Images
-                  <ImagesContainer >
-                    {details.data.images.backdrops.slice(0, 3).map((image) => (
-                      <Zoom
-                        overlayBgColorEnd='rgba(255 255 255 / .5)'
-                        zoomMargin={40}
-                        key={image.file_path}
+      <DetailsContainer
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0, transition: { duration: 0.2 } }}
+      >
+        {details.status !== RequestStatus.Finished ? (
+          <CustomSkeleton
+            sx={{
+              bgcolor: "grey.900",
+            }}
+            variant="rectangular"
+          />
+        ) : (
+          <DetailsRoot>
+            <DetailsFlexRows>
+              <DetailsFlexColumns>
+                <Poster
+                  initial={{ opacity: 0 }}
+                  variants={{
+                    isNotLoaded: { opacity: 0 },
+                    isLoaded: { opacity: 1 },
+                  }}
+                  animate={isPosterLoaded ? "isLoaded" : "isNotLoaded"}
+                  exit={{ opacity: 0, transition: { duration: 0.2 } }}
+                  imageUrl={posterUrl}
+                >
+                  <Rating>
+                    <StarIcon size={16.5} />
+                    {getFormattedRating(details.data.vote_average)}
+                  </Rating>
+                </Poster>
+                <Details>
+                  <Title>{details.data.title}</Title>
+                  <AdditionalInfo>
+                    <MetaInfo>
+                      <div>{dayjs(details.data.release_date).year()}</div>
+                      <div>{formatRutime(details.data.runtime)}</div>
+                    </MetaInfo>
+                    <Generes>
+                      {details.data.genres.map((genreDetails) => (
+                        <GenereCard key={genreDetails.id}>
+                          {genreDetails.name}
+                        </GenereCard>
+                      ))}
+                    </Generes>
+                  </AdditionalInfo>
+                  <Overview>{details.data.overview}</Overview>
+                  <Images>
+                    Images
+                    <ImagesContainer>
+                      {details.data.images.backdrops
+                        .slice(0, 3)
+                        .map((image) => (
+                          <Zoom
+                            overlayBgColorEnd="rgba(255 255 255 / .5)"
+                            zoomMargin={40}
+                            key={image.file_path}
+                          >
+                            <ImageRect
+                              src={getImageUrl(image.file_path, "original")}
+                            />
+                          </Zoom>
+                        ))}
+                    </ImagesContainer>
+                  </Images>
+                  <ActorsList data={details.data} />
+                </Details>
+              </DetailsFlexColumns>
+              {+details?.data?.reviews?.results?.length > 0 && (
+                <Reviews>
+                  Reviews
+                  <ReviewCards>
+                    {details.data.reviews.results.slice(0, 3).map((review) => (
+                      <ReviewCard
+                        rating={review?.author_details?.rating}
+                        key={review.id}
+                        onClick={() => {
+                          console.log(1)
+                          dispatchModal({
+                            type: "open-modal",
+                            payload: (
+                              <ReviewModal
+                                handleClose={() =>
+                                  dispatchModal({
+                                    type: "close-modal",
+                                  })
+                                }
+                                review={review}
+                              />
+                            ),
+                          })
+                        }
+                        }
                       >
-                        <ImageRect
-                          
-                          src={getImageUrl(image.file_path, "original")}
-                        />
-                      </Zoom>
+                        <QuoteIcon />
+                        <ReviewHeader>
+                          <ReviewerName>{review.author}</ReviewerName>
+                          {review.author_details.rating && (
+                            <ReviewRating>
+                              <StarIcon size={11} />
+                              {getFormattedRating(review.author_details.rating)}
+                            </ReviewRating>
+                          )}
+                        </ReviewHeader>
+                        <ReviewText>
+                          <ReactMarkdown>{review.content}</ReactMarkdown>
+                        </ReviewText>
+                      </ReviewCard>
                     ))}
-                  </ImagesContainer>
-                </Images>
-                <ActorsList data={details.data} />
-              </Details>
-            </DetailsFlexColumns>
-            <Reviews >
-              Reviews
-              <ReviewCards >
-                {details.data.reviews.results.slice(0, 3).map((review) => (
-                  <ReviewCard rating={review?.author_details?.rating} >
-                    <QuoteIcon  />
-                    <ReviewHeader >
-                      <ReviewerName >{review.author}</ReviewerName>
-                      {review.author_details.rating && (
-                        <ReviewRating >
-                          <StarIcon size={11} />
-                          {getFormattedRating(review.author_details.rating)}
-                        </ReviewRating>
-                      )}
-                    </ReviewHeader>
-                    <ReviewText >
-                      <ReactMarkdown>
-                        {review.content}
-                      </ReactMarkdown>
-                    </ReviewText>
-                  </ReviewCard>
-                ))}
-              </ReviewCards>
-            </Reviews>
-          </DetailsFlexRows>
-        </DetailsRoot>
+                  </ReviewCards>
+                </Reviews>
+              )}
+            </DetailsFlexRows>
+          </DetailsRoot>
+        )}
       </DetailsContainer>
     </>
   );
-}
+};
 
-export default DetailsPage
+export default DetailsPage;

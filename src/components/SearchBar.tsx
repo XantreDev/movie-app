@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useRef } from 'react'
 import { useEffect } from 'react';
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -64,16 +64,20 @@ const SearchBar = ({}: SearchBarProps) => {
   const navigate = useNavigate()
   const [searchRequest, setSearchRequest] = useState('')
   const location = useLocation()
+  const prevSearchRequestRef = useRef<null | string>(null)
 
   useEffect(() => {
     if (searchRequest.length) {
       navigate(`/${Paths.Search}/${searchRequest}`, {
         replace: location.pathname.includes(Paths.Search)
       })
+      prevSearchRequestRef.current = searchRequest
       return
     }
 
-    navigate(-1)
+    if (prevSearchRequestRef.current !== null) {
+      navigate(-1)
+    }
   }, [searchRequest])
 
   useEffect(() => {

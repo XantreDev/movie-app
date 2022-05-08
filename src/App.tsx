@@ -12,6 +12,9 @@ import DetailsPage from "./pages/DetailsPage";
 import { MovieSearchData, MoviesSearchRequest, RequestStatus } from "./types/movieSearchResults";
 import { HelmetProvider } from "react-helmet-async";
 import { Paths } from './constants/paths'
+import NotificationsProvider from "./components/NotificationsProvider";
+import ModalProvider from "./components/ModalProvider";
+import AllProviders from "./components/AllProviders";
 
 
 const Cursor = styled.div`
@@ -55,41 +58,47 @@ const BodyStyle = createGlobalStyle<{path: Paths}>`
 
 
 function App() {
-  const cursorRef = useRef<HTMLDivElement>()
+  const cursorRef = useRef<HTMLDivElement>();
 
-  const navigate = useNavigate()
-  const location = useLocation() ?? {pathname: ''}
+  const navigate = useNavigate();
+  const location = useLocation() ?? { pathname: "" };
 
   const locationPath = useMemo(() => {
-    if (location.pathname.includes(Paths.Details)) return Paths.Details
-    if (location.pathname.includes(Paths.Search)) return Paths.Search
-    return Paths.Main
-  }, [location]) as Paths
+    if (location.pathname.includes(Paths.Details)) return Paths.Details;
+    if (location.pathname.includes(Paths.Search)) return Paths.Search;
+    return Paths.Main;
+  }, [location]) as Paths;
 
   return (
-    <>
-      <HelmetProvider>
-        <BodyStyle path={locationPath}/>
+    <AllProviders>
+      <RootDiv path={locationPath}>
+        <BodyStyle path={locationPath} />
         <div className="App">
-        <StyleProvider>
-          <MoviesDataProvider>
-            <RootDiv path={locationPath} >
-              <SearchBar/>
-              <AnimatePresence exitBeforeEnter>
-                <Routes location={location} key={locationPath}>
-                  <Route key="main-route" path={`/${Paths.Main}`} element={<MainPage />} />
-                  <Route key="search-route" path={`/${Paths.Search}/:searchQuery`} element={<SearchPage />} />
-                  <Route key="film-details-route" path={`/${Paths.Details}/:movieId`} element={<DetailsPage />} />
-                </Routes>
-              </AnimatePresence>
-            </RootDiv>
-          </MoviesDataProvider>
-        </StyleProvider>
-            </div>
-            {/* <div id="cursor" ref={cursorRef}></div> */}
-            {/* <Cursor ref={cursorRef}></Cursor> */}
-      </HelmetProvider>
-    </>
+          <SearchBar />
+          <AnimatePresence exitBeforeEnter>
+            <Routes location={location} key={locationPath}>
+              <Route
+                key="main-route"
+                path={`/${Paths.Main}`}
+                element={<MainPage />}
+              />
+              <Route
+                key="search-route"
+                path={`/${Paths.Search}/:searchQuery`}
+                element={<SearchPage />}
+              />
+              <Route
+                key="film-details-route"
+                path={`/${Paths.Details}/:movieId`}
+                element={<DetailsPage />}
+              />
+            </Routes>
+          </AnimatePresence>
+        </div>
+      </RootDiv>
+      {/* <div id="cursor" ref={cursorRef}></div> */}
+      {/* <Cursor ref={cursorRef}></Cursor> */}
+    </AllProviders>
   );
 }
 
