@@ -71,31 +71,31 @@ function App() {
 
   return (
     <AllProviders>
-      <RootDiv path={locationPath}>
-        <BodyStyle path={locationPath} />
-        <div className="App">
-          <SearchBar />
-          <AnimatePresence exitBeforeEnter>
-            <Routes location={location} key={locationPath}>
-              <Route
-                key="main-route"
-                path={`/${Paths.Main}`}
-                element={<MainPage />}
-              />
-              <Route
-                key="search-route"
-                path={`/${Paths.Search}/:searchQuery`}
-                element={<SearchPage />}
-              />
-              <Route
-                key="film-details-route"
-                path={`/${Paths.Details}/:movieId`}
-                element={<DetailsPage />}
-              />
-            </Routes>
-          </AnimatePresence>
-        </div>
-      </RootDiv>
+      <div className="App">
+        <RootDiv path={locationPath}>
+          <BodyStyle path={locationPath} />
+            <SearchBar />
+            <AnimatePresence exitBeforeEnter>
+              <Routes location={location} key={locationPath}>
+                <Route
+                  key="main-route"
+                  path={`/${Paths.Main}`}
+                  element={<MainPage />}
+                />
+                <Route
+                  key="search-route"
+                  path={`/${Paths.Search}/:searchQuery`}
+                  element={<SearchPage />}
+                />
+                <Route
+                  key="film-details-route"
+                  path={`/${Paths.Details}/:movieId`}
+                  element={<DetailsPage />}
+                />
+              </Routes>
+            </AnimatePresence>
+        </RootDiv>
+      </div>
       {/* <div id="cursor" ref={cursorRef}></div> */}
       {/* <Cursor ref={cursorRef}></Cursor> */}
     </AllProviders>

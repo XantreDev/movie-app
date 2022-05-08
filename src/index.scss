@@ -9,7 +9,30 @@
 
 body {
   overflow: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: #aaa #333;
+    color: #333;
+    transition: color 200ms;
 }
+
+body::-webkit-scrollbar {
+    width: min(6px, 1.5vw);
+    box-shadow: inset 0 0 0 20px;
+}
+
+body::-webkit-scrollbar-thumb {
+    background-color: #aaa;
+    border-radius: 3px;
+}
+
+body:hover {
+    color: #010101;
+}
+
+body > * {
+    color: white;
+}
+
 
 *,
 *::after,

@@ -84,9 +84,6 @@ const ReviewText = styled.div`
   &::-webkit-scrollbar {
     width: min(1vw, 4px);
   }
-
-  &::-webkit-scrollbar-track {
-  }
   
   &::-webkit-scrollbar-thumb {
     border-radius: 3px;
