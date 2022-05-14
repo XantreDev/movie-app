@@ -27,6 +27,7 @@
     "react-medium-image-zoom": "^4.3.7",
     "react-router-dom": "^6.2.1",
     "react-scripts": "^5.0.1",
+    "react-swipeable": "^7.0.0",
     "react-transition-group": "^4.4.2",
     "react-youtube": "^7.14.0",
     "sass": "^1.49.0",

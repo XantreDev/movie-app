@@ -14,6 +14,8 @@ import { Keys } from "./../constants/keys"
 import { notificationContext } from "./NotificationsProvider";
 import useCentralIndex from "./useCentralIndex";
 import useRowLastPage from "../hooks/useRowLastPage";
+import { useSwipeable } from "react-swipeable";
+import { noop } from "lodash-es";
 
 const ContentRoot = styled(motion.div)`
   position: absolute;
@@ -86,6 +88,16 @@ const MoviesSlider = ({ data, position }: MoviesSliderProps) => {
 
     return "nowhere";
   }, [moviesData, centralIndex]);
+
+  const { ref } = useSwipeable({
+    onSwipedLeft: position === 'center' ? increment : noop,
+    onSwipedRight: position === 'center' ? decriment : noop,
+    trackMouse: false
+  })
+
+  useEffect(() => {
+    ref(document as unknown as HTMLElement)
+  })
 
   const [getTargetPage, incrementTargetPage] = useRowLastPage(genre.id)
 

@@ -27,6 +27,7 @@ specifiers:
   react-medium-image-zoom: ^4.3.7
   react-router-dom: ^6.2.1
   react-scripts: ^5.0.1
+  react-swipeable: ^7.0.0
   react-transition-group: ^4.4.2
   react-youtube: ^7.14.0
   sass: ^1.49.0
@@ -58,6 +59,7 @@ dependencies:
   react-medium-image-zoom: 4.4.0_ef5jwxihqo6n7gxfmzogljlgcm
   react-router-dom: 6.3.0_ef5jwxihqo6n7gxfmzogljlgcm
   react-scripts: 5.0.1_4bzq3qjpnbphd7c3i4je27vbwa
+  react-swipeable: 7.0.0_react@18.1.0
   react-transition-group: 4.4.2_ef5jwxihqo6n7gxfmzogljlgcm
   react-youtube: 7.14.0_react@18.1.0
   sass: 1.51.0
@@ -9220,6 +9222,14 @@ packages:
       - webpack-cli
       - webpack-hot-middleware
       - webpack-plugin-serve
+    dev: false
+
+  /react-swipeable/7.0.0_react@18.1.0:
+    resolution: {integrity: sha512-NI7KGfQ6gwNFN0Hor3vytYW3iRfMMaivGEuxcADOOfBCx/kqwXE8IfHFxEcxSUkxCYf38COLKYd9EMYZghqaUA==}
+    peerDependencies:
+      react: ^16.8.3 || ^17 || ^18
+    dependencies:
+      react: 18.1.0
     dev: false
 
   /react-transition-group/4.4.2_ef5jwxihqo6n7gxfmzogljlgcm:

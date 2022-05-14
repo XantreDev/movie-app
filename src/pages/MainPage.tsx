@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
-import React, { useContext, useState, useEffect, useRef, useCallback, useMemo } from "react";
+import React, { useContext, useState, useEffect, useRef, useCallback, useMemo, RefCallback } from "react";
 import styled, { AnyStyledComponent, StyledComponent } from "styled-components";
 import SearchBar from "../components/SearchBar";
 import { Styles } from "../contexts/StyleProvider";
@@ -20,6 +20,7 @@ import { transitionProps } from "../constants/props";
 import { Helmet } from 'react-helmet-async'
 import NotificationsProvider, { notificationContext } from "../components/NotificationsProvider";
 import useRowIndex from "../hooks/useRowIndex";
+import { useSwipeable } from "react-swipeable";
 
 
 const ArrowDownIcon = styled(arrowDownIcon)`
@@ -136,6 +137,16 @@ const MainPage = () => {
     key: Keys.ArrowUp,
     callback: rowDecrease
   })
+
+  const { ref } = useSwipeable({
+    onSwipedDown: rowDecrease,
+    onSwipedUp: rowIncrease
+  })
+
+  useEffect(() => {
+    ref(document as unknown as HTMLElement)
+  })
+
 
   return (
       <>
