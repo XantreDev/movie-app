@@ -2,6 +2,7 @@
   "name": "movie-app",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://XantreGodlike.gihub.io/movie-app",
   "dependencies": {
     "@emotion/react": "^11.9.0",
     "@emotion/styled": "^11.8.1",
@@ -37,7 +38,9 @@
     "start": "react-app-rewired start",
     "build": "react-app-rewired build",
     "test": "react-app-rewired test",
-    "eject": "react-app-rewired eject"
+    "eject": "react-app-rewired eject",
+    "deploy": "gh-pages -d build",
+    "predeploy": "yarn build"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -57,6 +60,7 @@
   "devDependencies": {
     "@types/lodash-es": "^4.17.6",
     "@types/react-helmet-async": "^1.0.3",
+    "gh-pages": "^4.0.0",
     "react-app-rewired": "^2.2.1"
   }
 }
