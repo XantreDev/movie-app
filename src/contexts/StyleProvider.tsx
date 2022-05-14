@@ -14,9 +14,9 @@ export const Styles = {
     textBright: 'hsla(0, 0%, 100%, 1)',
     accent: 'hsla(24, 95%, 58%, 1)',
     reviewCards: {
-      good: "hsla(97, 20%, 16%, 1)",
-      bad: "hsla(360, 20%, 16%, 1)",
-      none: "hsla(0, 0%, 16%, 1)"
+      good: "hsla(97, 35%, 24%, 1)",
+      bad: "hsla(360, 35%, 24%, 1)",
+      none: "hsla(0, 0%, 24%, 1)"
     },
     modalContainer: {
       background: "background: hsla(0, 0%, 0%, 0.3)",

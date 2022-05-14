@@ -24,6 +24,8 @@ const SearchRoot = styled.div`
 
   border-radius: ${({ theme: { borderRadiuses }}) => borderRadiuses.default};
   z-index: 10;
+  
+  box-shadow: 2px 2px 6px rgb(0 0 0 / .4);
 `;
 
 const SearchField = styled.input`

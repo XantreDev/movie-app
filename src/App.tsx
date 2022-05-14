@@ -39,7 +39,7 @@ const RootDiv = styled.div<{ path: Paths }>`
   background: ${(props) => props.theme.colors.background};
   ${
     ({path}) => {
-      if (path.includes(Paths.Main)) {
+      if (path === Paths.Main) {
         return "height: 100vh;"
       }
       return "min-height: 100vh; background: #000;"

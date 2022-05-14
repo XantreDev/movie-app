@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import { motion } from "framer-motion";
-import React, { useContext, useEffect, useRef } from "react";
+import React, { useCallback, useContext, useEffect, useRef } from "react";
 import styled from "styled-components";
 import { moviesDataContextDispatch } from "../contexts/MoviesDataProvider";
 import { Styles } from "../contexts/StyleProvider";
@@ -12,6 +12,8 @@ import { Movie } from "../types/movie";
 import MovieCard from "./MovieCard";
 import { Keys } from "./../constants/keys"
 import { notificationContext } from "./NotificationsProvider";
+import useCentralIndex from "./useCentralIndex";
+import useRowLastPage from "../hooks/useRowLastPage";
 
 const ContentRoot = styled(motion.div)`
   position: absolute;
@@ -61,25 +63,27 @@ type MoviesSliderProps = {
 }
 
 const MoviesSlider = ({ data, position }: MoviesSliderProps) => {
-  const { currentCenter: centerIndex, movies: moviesData, genre } = data;
+  const { movies: moviesData, genre } = data;
 
   const offset = 5;
   const oneBunchLoad = 20;
+  const { centralIndex, decriment, increment, unsafeChange } = useCentralIndex(genre.id)
 
   const dispatch = useContext(moviesDataContextDispatch);
 
-  const whereNeedToLoadData = () => {
+  const whereNeedToLoadData = useCallback(() => {
     if (moviesData.length === 0) return "right";
-    if (Math.abs(moviesData.length - centerIndex) <= offset) {
+    if (Math.abs(moviesData.length - centralIndex) <= offset) {
       return "right";
     }
-    if (centerIndex <= offset) {
+    if (centralIndex <= offset) {
       return "left";
     }
 
     return "nowhere";
-  };
-  const targetPageRef = useRef<number>(1);
+  }, [moviesData, centralIndex]);
+
+  const [getTargetPage, incrementTargetPage] = useRowLastPage(genre.id)
 
   const notificationDispatch = useContext(notificationContext)
 
@@ -90,11 +94,11 @@ const MoviesSlider = ({ data, position }: MoviesSliderProps) => {
 
     const currentTime = dayjs();
     (async () => {
-      const targetPage = targetPageRef.current;
-      targetPageRef.current++;
+      const localTargetPage = getTargetPage();
+      incrementTargetPage()
       try {
         const movies = await MoviesDataService.getMoviesDiscoverPage(
-          targetPage,
+          localTargetPage,
           genre
         );
         dispatch({
@@ -125,9 +129,9 @@ const MoviesSlider = ({ data, position }: MoviesSliderProps) => {
             movies: Array.from(Array(oneBunchLoad)).map((__, index) => ({
               isFailed: true,
               isLoading: false,
-              id: currentTime.toISOString() + index,
+              id: currentTime.toISOString() + genre.id + index,
               loadStarted: currentTime,
-              key: currentTime.toISOString() + index
+              key: currentTime.toISOString() + genre.id + index
             })),
           },
         });
@@ -138,9 +142,9 @@ const MoviesSlider = ({ data, position }: MoviesSliderProps) => {
       (__, index) =>
         ({
           isLoading: true,
-          id: currentTime.toISOString() + index,
+          id: currentTime.toISOString() + genre.id + index,
           loadStarted: currentTime,
-          key: currentTime.toISOString() + index
+          key: currentTime.toISOString() + genre.id + index
         })
     );
 
@@ -152,6 +156,10 @@ const MoviesSlider = ({ data, position }: MoviesSliderProps) => {
         movies: tmp,
       },
     });
+    if (whereLoad === 'left') {
+      unsafeChange(oneBunchLoad)
+    }
+
     // if (whereLoad === "left") {
     //   setMoviesData((prev) => [...tmp, ...prev]);
     //   setCenterIndex((prev) => prev + oneBunchLoad);
@@ -159,19 +167,19 @@ const MoviesSlider = ({ data, position }: MoviesSliderProps) => {
     // if (whereLoad === "right") {
     //   setMoviesData((prev) => [...prev, ...tmp]);
     // }
-  }, [centerIndex]);
+  }, [centralIndex]);
 
   const getPosition = (index): CardPosition => {
     switch (index) {
-      case centerIndex - 1:
+      case centralIndex - 1:
         return "left";
-      case centerIndex + 1:
+      case centralIndex + 1:
         return "right";
-      case centerIndex:
+      case centralIndex:
         return "center";
-      case centerIndex - 2:
+      case centralIndex - 2:
         return "lefter";
-      case centerIndex + 2:
+      case centralIndex + 2:
         return "righter";
       default:
         return "invisible";
@@ -181,26 +189,13 @@ const MoviesSlider = ({ data, position }: MoviesSliderProps) => {
   useInputSlider(
     {
       key: Keys.ArrowRight,
-      callback: () =>
-        dispatch({
-          type: "change-index",
-          payload: {
-            genre,
-            type: "increment",
-          },
-        }),
+      callback: increment,
     },
     {
       key: Keys.ArrowLeft,
-      callback: () =>
-        dispatch({
-          type: "change-index",
-          payload: {
-            genre,
-            type: "decriment",
-          },
-        }),
-    }
+      callback: decriment,
+    },
+    position === 'center'
   );
   return (
     <ContentRoot
@@ -239,15 +234,9 @@ const MoviesSlider = ({ data, position }: MoviesSliderProps) => {
             position={getPosition(index)}
             movieData={movieData}
             onClick={() => {
-              if (index === centerIndex) return;
+              if (index === centralIndex) return;
 
-              dispatch({
-                type: "change-index",
-                payload: {
-                  type: index < centerIndex ? "decriment" : "increment",
-                  genre,
-                },
-              });
+              index < centralIndex ? decriment() : increment()
             }}
             key={movieData.key}
           />

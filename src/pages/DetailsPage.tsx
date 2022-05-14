@@ -12,7 +12,7 @@ import { RequestStatus } from '../types/movieSearchResults'
 import Zoom from 'react-medium-image-zoom'
 import 'react-medium-image-zoom/dist/styles.css'
 import { formatRutime, getFormattedRating } from '../utils/utils'
-import { motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 import { transitionProps } from '../constants/props'
 import useLazyBackgroundImage from '../hooks/useLazyBackgroundImage'
 import ReactMarkdown from 'react-markdown'
@@ -41,7 +41,7 @@ const DetailsContainer = styled(motion.div)`
   position: relative;
 `
 
-const DetailsRoot = styled.article`
+const DetailsRoot = styled(motion.article)`
   flex: 1 0 100%;
 
   background-color: ${({ theme: { colors } }) => colors.background};
@@ -250,13 +250,16 @@ const ReviewCard = styled.article<{rating?: number}>`
     if (props?.rating <= 5) return props.theme.colors.reviewCards.bad
     return props.theme.colors.reviewCards.good
   }};
+
   cursor: pointer;
   padding: 10px 20px;
   border-radius: ${props => props.theme.borderRadiuses.cardBadge};
   display: flex;
   flex-direction: column;
   gap: 10px;
-  max-width: 100%;
+  @media screen and (min-width: 800px) {
+    max-width: 50%;
+  }
   height: 200px;
   position: relative;
 `
@@ -395,19 +398,31 @@ const DetailsPage = () => {
         exit={{ opacity: 0, transition: { duration: 0.2 } }}
       />
       <DetailsContainer
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0, transition: { duration: 0.2 } }}
       >
+        <AnimatePresence>
         {details.status !== RequestStatus.Finished ? (
-          <CustomSkeleton
-            sx={{
-              bgcolor: "grey.900",
-            }}
-            variant="rectangular"
-          />
+          <motion.div
+            style={{display: 'contents'}}
+            key="details-loader"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0, transition: { duration: 0.2 } }}
+          >
+            <CustomSkeleton
+              sx={{
+                bgcolor: "grey.900",
+                opacity: "inherit"
+              }}
+              variant="rectangular"
+            />
+          </motion.div>
         ) : (
-          <DetailsRoot>
+          <DetailsRoot
+            key="details-root"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0, transition: { duration: 0.2 } }}
+          >
             <DetailsFlexRows>
               <DetailsFlexColumns>
                 <Poster
@@ -509,6 +524,7 @@ const DetailsPage = () => {
             </DetailsFlexRows>
           </DetailsRoot>
         )}
+        </AnimatePresence>
       </DetailsContainer>
     </>
   );

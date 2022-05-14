@@ -12,13 +12,14 @@ import dayjs from "dayjs";
 import { MoviesDataService } from "../DataService/MoviesDataService";
 import MovieCard from "../components/MovieCard";
 import useInputSlider from "../hooks/useInputSlider";
-import { moviesDataContext } from "../contexts/MoviesDataProvider";
+import { moviesDataContext, indexesRefContext } from "../contexts/MoviesDataProvider";
 import { MoviesDataLoaded } from "../types/context";
 import MoviesSlider, { HorizontalPosition } from "../components/MoviesSlider";
 import { Keys } from "../constants/keys";
 import { transitionProps } from "../constants/props";
 import { Helmet } from 'react-helmet-async'
 import NotificationsProvider, { notificationContext } from "../components/NotificationsProvider";
+import useRowIndex from "../hooks/useRowIndex";
 
 
 const ArrowDownIcon = styled(arrowDownIcon)`
@@ -117,7 +118,8 @@ const MainPage = () => {
   const data = useContext(moviesDataContext);
   const { isGeneresLoading } = data;
 
-  const [rowIndex, setRowIndex] = useState(0);
+  const [ rowIndex, setRowIndex ] = useRowIndex()
+
   const canChangeRowTo = useCallback((index: number) => {
     return data.isGeneresLoading === false && data.data.length > index && index >= 0
   }, [data]);

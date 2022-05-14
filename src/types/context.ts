@@ -99,3 +99,9 @@ type CloseModalAction = {
 }
 
 export type ModalActions = OpenModalAction | CloseModalAction
+
+export type SliderMetaInfo = {
+  rowIndex: number,
+  columnIndexes: { [genreId in number]: number }
+  rowLastPage: { [genreId in number]: number }
+}

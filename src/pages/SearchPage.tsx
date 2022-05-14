@@ -9,6 +9,7 @@ import starIcon from "../svg/starIcon";
 import { MoviesSearchRequest, MoviesSearchResult, MoviesSearchResultTransformed, RequestStatus } from "../types/movieSearchResults";
 import { getFormattedRating, redirectToMovie } from "../utils/utils";
 import { Helmet } from 'react-helmet-async';
+import { useDebounce } from "use-debounce";
 
 export type SearchPageProps = {
   data: MoviesSearchRequest
@@ -145,8 +146,10 @@ const RatingSection = styled.span`
 `
 
 const SearchPage = () => {
-  const { searchQuery : searchRequest } = useParams()
+  const { searchQuery : searchRequestNotDebounced } = useParams()
+  const [ searchRequest ] = useDebounce(searchRequestNotDebounced, 300) 
   const [searchResults, setSearchResults] = useState<MoviesSearchRequest>({ status: RequestStatus.Loading })
+
 
   useEffect(() => {
     const currentRequest = searchRequest;
@@ -189,7 +192,7 @@ const SearchPage = () => {
   return (
     <>
       <Helmet>
-        <title>${searchRequest}</title>
+        <title>{searchRequest}</title>
       </Helmet>
       <SearchContainer
         

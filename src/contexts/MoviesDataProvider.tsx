@@ -1,10 +1,11 @@
 import produce from "immer";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createContext } from "react";
 import { useReducer } from "react";
 import { useContext } from "react";
 import { MoviesDataService } from "../DataService/MoviesDataService";
 import {
+  SliderMetaInfo,
   MoviesData,
   MoviesDataActions,
   MoviesDataLoaded,
@@ -28,7 +29,7 @@ const reducer: React.Reducer<MoviesData, MoviesDataActions> = (
             currentCenter: 10,
             genre,
             movies: [],
-            lastPage: 1
+            lastPage: 1,
           })),
         };
       }
@@ -40,7 +41,7 @@ const reducer: React.Reducer<MoviesData, MoviesDataActions> = (
           (value) => value.genre.id === genre.id
         );
         if (targetIndex === -1) return;
-        realDraft.data[targetIndex].lastPage++
+        realDraft.data[targetIndex].lastPage++;
         if (direction === "left") {
           realDraft.data[targetIndex].movies.unshift(...movies);
           realDraft.data[targetIndex].currentCenter += movies.length;
@@ -63,7 +64,7 @@ const reducer: React.Reducer<MoviesData, MoviesDataActions> = (
           (
             (currentIndex = 0) =>
             (movie: Movie): Movie => {
-              if (currentIndex === movies.length) return movie
+              if (currentIndex === movies.length) return movie;
               if (movie.isLoading && movie.loadStarted.isSame(loadStarted)) {
                 return {
                   ...movies[currentIndex++],
@@ -75,18 +76,19 @@ const reducer: React.Reducer<MoviesData, MoviesDataActions> = (
         );
         break;
       }
-      case 'change-index':{
+      case "change-index": {
         if (draftState.isGeneresLoading) return;
-        const { genre, type } = action.payload
+        const { genre, type } = action.payload;
         const realDraft = draftState as MoviesDataLoaded;
-        
+
         const rowIndex = realDraft.data.findIndex(
           (value) => value.genre.id === genre.id
         );
         if (rowIndex === -1) return;
-        
-        const center = realDraft.data[rowIndex].currentCenter
-        realDraft.data[rowIndex].currentCenter = type === 'decriment' ? center - 1 : center + 1
+
+        const center = realDraft.data[rowIndex].currentCenter;
+        realDraft.data[rowIndex].currentCenter =
+          type === "decriment" ? center - 1 : center + 1;
         break;
       }
       case "update-movie": {
@@ -114,10 +116,40 @@ const reducer: React.Reducer<MoviesData, MoviesDataActions> = (
   });
 
 export const moviesDataContext = createContext({} as MoviesData);
-export const moviesDataContextDispatch = createContext({} as React.Dispatch<MoviesDataActions>);
+export const moviesDataContextDispatch = createContext(
+  {} as React.Dispatch<MoviesDataActions>
+);
+export const indexesRefContext = createContext(
+  {} as React.MutableRefObject<SliderMetaInfo>
+);
 
 const MoviesDataProvider = ({ children }: React.PropsWithChildren<{}>) => {
   const [state, dispatch] = useReducer(reducer, initialState);
+  const indexRef = useRef<SliderMetaInfo>({
+    rowIndex: 0,
+    columnIndexes: [],
+    rowLastPage: []
+  });
+
+  useLayoutEffect(() => {
+    if (
+      state.isGeneresLoading === false &&
+      !Object.keys(indexRef.current.columnIndexes).length
+    ) {
+      indexRef.current.columnIndexes = state.data.reduce<
+        SliderMetaInfo["columnIndexes"]
+      >(
+        (prev, { currentCenter, genre }) => ({
+          [genre.id]: currentCenter,
+          ...prev,
+        }),
+        {}
+      );
+      indexRef.current.rowLastPage = state.data.reduce<
+        SliderMetaInfo["rowLastPage"]
+      >((state, { genre: { id } }) => ({ ...state, [id]: 1}), {});
+    }
+  }, [state]);
 
   useEffect(() => {
     (async () => {
@@ -131,7 +163,9 @@ const MoviesDataProvider = ({ children }: React.PropsWithChildren<{}>) => {
   return (
     <moviesDataContext.Provider value={state}>
       <moviesDataContextDispatch.Provider value={dispatch}>
-        {children}
+        <indexesRefContext.Provider value={indexRef}>
+          {children}
+        </indexesRefContext.Provider>
       </moviesDataContextDispatch.Provider>
     </moviesDataContext.Provider>
   );
