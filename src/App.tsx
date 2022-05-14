@@ -35,6 +35,8 @@ const Cursor = styled.div`
 
 
 const RootDiv = styled.div<{ path: Paths }>`
+
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0.2);
   width: 100vw;
   background: ${(props) => props.theme.colors.background};
   ${

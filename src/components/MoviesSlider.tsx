@@ -38,9 +38,13 @@ const ContentGenreTitle = styled(motion.h2)`
   ${ContainerStyle}
 
   user-select: none;
-  font-size: 5.6rem;
+  font-size: clamp(2rem, 8vw, 5.6rem); 
   font-weight: 600;
-  line-height: 6.6rem;
+  line-height: calc(clamp(2rem, 8vw, 5.6rem) * 1.2);
+
+  @media screen and (max-width: 500px) {
+    transform: translateX(-15%);
+  }  
 
   color: ${({ theme: { colors }}) => colors.accent};
 `;
