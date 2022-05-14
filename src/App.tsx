@@ -1,6 +1,6 @@
 import { AnimatePresence } from "framer-motion";
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
-import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import styled, { createGlobalStyle } from "styled-components";
 import SearchBar from "./components/SearchBar";
 import MoviesDataProvider from "./contexts/MoviesDataProvider";
@@ -92,6 +92,7 @@ function App() {
                   path={`/${Paths.Details}/:movieId`}
                   element={<DetailsPage />}
                 />
+                <Route path={'*'} element={<Navigate to={`/${Paths.Main}`}/>} />
               </Routes>
             </AnimatePresence>
         </RootDiv>
