@@ -1,26 +1,27 @@
-import { AnimatePresence, motion } from "framer-motion";
-import React, { useContext, useState, useEffect, useRef, useCallback, useMemo, RefCallback } from "react";
-import styled, { AnyStyledComponent, StyledComponent } from "styled-components";
-import SearchBar from "../components/SearchBar";
-import { Styles } from "../contexts/StyleProvider";
-import searchIcon from "../svg/searchIcon";
-import arrowDownIcon from "../svg/arrowDownIcon";
-import starIcon from "../svg/starIcon";
-import stopwatchIcon from "../svg/stopwatchIcon";
-import { Movie } from "../types/movie";
 import dayjs from "dayjs";
-import { MoviesDataService } from "../DataService/MoviesDataService";
+import { AnimatePresence, motion } from "framer-motion";
+import React, { RefCallback,useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { Helmet } from 'react-helmet-async'
+import { useSwipeable } from "react-swipeable";
+import styled, { AnyStyledComponent, StyledComponent } from "styled-components";
+
 import MovieCard from "../components/MovieCard";
-import useInputSlider from "../hooks/useInputSlider";
-import { moviesDataContext, indexesRefContext } from "../contexts/MoviesDataProvider";
-import { MoviesDataLoaded } from "../types/context";
 import MoviesSlider, { HorizontalPosition } from "../components/MoviesSlider";
+import NotificationsProvider, { notificationContext } from "../components/NotificationsProvider";
+import SearchBar from "../components/SearchBar";
 import { Keys } from "../constants/keys";
 import { transitionProps } from "../constants/props";
-import { Helmet } from 'react-helmet-async'
-import NotificationsProvider, { notificationContext } from "../components/NotificationsProvider";
+import { indexesRefContext,moviesDataContext } from "../contexts/MoviesDataProvider";
+import { Styles } from "../contexts/StyleProvider";
+import { MoviesDataService } from "../DataService/MoviesDataService";
+import useInputSlider from "../hooks/useInputSlider";
 import useRowIndex from "../hooks/useRowIndex";
-import { useSwipeable } from "react-swipeable";
+import arrowDownIcon from "../svg/arrowDownIcon";
+import searchIcon from "../svg/searchIcon";
+import starIcon from "../svg/starIcon";
+import stopwatchIcon from "../svg/stopwatchIcon";
+import { MoviesDataLoaded } from "../types/context";
+import { Movie } from "../types/movie";
 
 
 const ArrowDownIcon = styled(arrowDownIcon)`

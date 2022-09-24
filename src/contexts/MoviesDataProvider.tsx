@@ -1,14 +1,18 @@
 import produce from "immer";
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { createContext } from "react";
-import { useReducer } from "react";
-import { useContext } from "react";
+import React, {
+  createContext,
+  useEffect,
+  useLayoutEffect,
+  useReducer,
+  useRef
+} from "react";
+
 import { MoviesDataService } from "../DataService/MoviesDataService";
 import {
-  SliderMetaInfo,
   MoviesData,
   MoviesDataActions,
   MoviesDataLoaded,
+  SliderMetaInfo
 } from "../types/context";
 import { Movie } from "../types/movie";
 import { AC } from "./actionCreaters";
@@ -128,7 +132,7 @@ const MoviesDataProvider = ({ children }: React.PropsWithChildren<{}>) => {
   const indexRef = useRef<SliderMetaInfo>({
     rowIndex: 0,
     columnIndexes: [],
-    rowLastPage: []
+    rowLastPage: [],
   });
 
   useLayoutEffect(() => {
@@ -147,7 +151,7 @@ const MoviesDataProvider = ({ children }: React.PropsWithChildren<{}>) => {
       );
       indexRef.current.rowLastPage = state.data.reduce<
         SliderMetaInfo["rowLastPage"]
-      >((state, { genre: { id } }) => ({ ...state, [id]: 1}), {});
+      >((state, { genre: { id } }) => ({ ...state, [id]: 1 }), {});
     }
   }, [state]);
 

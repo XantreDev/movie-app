@@ -1,14 +1,14 @@
 import { Skeleton } from "@mui/material";
 import { motion } from "framer-motion";
 import React from "react";
-import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
+
 import useCombineCallbacksByState from "../hooks/useCombineCallbacksByState";
 import { CardPosition } from "../pages/MainPage";
 import starIcon from "../svg/starIcon";
 import stopwatchIcon from "../svg/stopwatchIcon";
-import { LoadedMovie, Movie, ReleaseDate } from "../types/movie";
+import { LoadedMovie, Movie } from "../types/movie";
 import { getFormattedRating, redirectToMovie } from "../utils/utils";
 
 const Card = styled(motion.article)`
@@ -18,8 +18,8 @@ const Card = styled(motion.article)`
   cursor: pointer;
   pointer-events: all;
 
-  border-radius: ${({ theme: { borderRadiuses }}) => borderRadiuses.default};
-  background-color: ${({ theme:{ colors } }) => colors.tint};
+  border-radius: ${({ theme: { borderRadiuses } }) => borderRadiuses.default};
+  background-color: ${({ theme: { colors } }) => colors.tint};
   inset: 0;
   position: absolute;
   overflow: hidden;
@@ -80,9 +80,9 @@ const CardBadge = styled.div`
   width: 100%;
   min-height: 80px;
   padding: 0 40px;
-  border-radius: ${({ theme: { borderRadiuses }}) => borderRadiuses.cardBadge};
+  border-radius: ${({ theme: { borderRadiuses } }) => borderRadiuses.cardBadge};
 
-  color: ${({ theme:{ colors } }) => colors.textBright};
+  color: ${({ theme: { colors } }) => colors.textBright};
 
   display: flex;
   justify-content: space-between;
@@ -95,7 +95,7 @@ const StopwatchIcon = styled(stopwatchIcon)`
 `;
 
 const CardTimer = styled.div`
-  background: ${({ theme:{ colors } }) => colors.textBright};
+  background: ${({ theme: { colors } }) => colors.textBright};
   height: 32px;
   width: 78px;
   display: flex;
@@ -115,7 +115,7 @@ const TimerTime = styled.div`
   line-height: 18px;
   letter-spacing: 0.05em;
 
-  color: ${({ theme:{ colors } }) => colors.background};
+  color: ${({ theme: { colors } }) => colors.background};
 `;
 
 const CardInfo = styled.div`
@@ -152,7 +152,7 @@ const SkeletonContainer = styled.div<{ isFailed: boolean }>`
     content: "Loading failed :(";
     font-size: 36px;
     font-weight: 400;
-    color: ${({ theme:{ colors } }) => colors.text};
+    color: ${({ theme: { colors } }) => colors.text};
 
     position: absolute;
     left: 50%;
@@ -191,18 +191,22 @@ const MovieCard = ({ position, movieData, onClick }: MovieCardProps) => {
   if ("isFailed" in movieData) {
     isFailed = movieData.isFailed;
   }
-  const navigate = useNavigate()
-  const handleClick = useCombineCallbacksByState([{
-    callback: () => redirectToMovie(navigate, movieData.id),
-    target: 'center',
-    isNeedToUse: !isLoading && !isFailed
-  }, {
-    callback: onClick
-  }], position)
+  const navigate = useNavigate();
+  const handleClick = useCombineCallbacksByState(
+    [
+      {
+        callback: () => redirectToMovie(navigate, movieData.id),
+        target: "center",
+        isNeedToUse: !isLoading && !isFailed,
+      },
+      {
+        callback: onClick,
+      },
+    ],
+    position
+  );
 
   if (position === "invisible") return <></>;
-
-
 
   return (
     <Card
@@ -220,13 +224,12 @@ const MovieCard = ({ position, movieData, onClick }: MovieCardProps) => {
       }}
       initial={false}
       onClick={handleClick}
-      
     >
       {(() => {
         const isNeedToShowSkeleton = isFailed || isLoading;
         if (isNeedToShowSkeleton) {
           return (
-            <SkeletonContainer  isFailed={isFailed}>
+            <SkeletonContainer isFailed={isFailed}>
               <Skeleton
                 sx={{ bgcolor: "grey.900" }}
                 animation="wave"
@@ -247,16 +250,16 @@ const MovieCard = ({ position, movieData, onClick }: MovieCardProps) => {
         return (
           <>
             <img src={movieDataAsLoaded.img} alt="" />
-            <CardBadge >
-              <CardInfo >
-                <CardTitle >{movieDataAsLoaded.name}</CardTitle>
-                <CardBirthday >
+            <CardBadge>
+              <CardInfo>
+                <CardTitle>{movieDataAsLoaded.name}</CardTitle>
+                <CardBirthday>
                   {getFormattedReleaseDate(movieDataAsLoaded)}
                 </CardBirthday>
               </CardInfo>
-              <CardRating >
+              <CardRating>
                 <StarIcon />
-                <CardRatingText >
+                <CardRatingText>
                   {getFormattedRating(movieDataAsLoaded.rating)}
                 </CardRatingText>
               </CardRating>

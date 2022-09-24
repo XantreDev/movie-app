@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useMemo } from "react";
 import { throttle } from "lodash-es";
+import { useCallback, useEffect, useMemo } from "react";
 
 export type InputAction = {
   callback: () => void;
@@ -7,27 +7,46 @@ export type InputAction = {
 };
 
 type KeysStatus = {
-  isForwardPressed: boolean,
-  isBackwardPressed: boolean,
-} 
+  isForwardPressed: boolean;
+  isBackwardPressed: boolean;
+};
 
 const useInputSlider = (
   forwardAction: InputAction,
   backwardAction: InputAction,
   isNeedToUse = true
 ) => {
-  const throttledHandler = useMemo(() => throttle((event: KeyboardEvent, keys: KeysStatus) => {
-    if (event.key === forwardAction.key) {
-      forwardAction.callback();
-      keys.isForwardPressed = true;
-      return;
-    }
-    if (event.key === backwardAction.key) {
-      backwardAction.callback();
-      keys.isBackwardPressed = true;
-      return;
-    }
-  }, 200), [forwardAction, backwardAction])
+  const throttledClearHandler = useMemo(
+    () =>
+      throttle(
+        (
+          forwardAction: InputAction,
+          backwardAction: InputAction,
+          event: KeyboardEvent,
+          keys: KeysStatus
+        ) => {
+          if (event.key === forwardAction.key) {
+            forwardAction.callback();
+            keys.isForwardPressed = true;
+            return;
+          }
+          if (event.key === backwardAction.key) {
+            backwardAction.callback();
+            keys.isBackwardPressed = true;
+            return;
+          }
+        },
+        200
+      ),
+    []
+  );
+
+  type ThrottledArgs = Parameters<typeof throttledClearHandler>;
+  const throttledHandler = useCallback(
+    (...args: [ThrottledArgs[2], ThrottledArgs[3]]) =>
+      throttledClearHandler(forwardAction, backwardAction, ...args),
+    [backwardAction, forwardAction, throttledClearHandler]
+  );
 
   useEffect(() => {
     const listner = (() => {
@@ -35,12 +54,13 @@ const useInputSlider = (
         isForwardPressed: false,
         isBackwardPressed: false,
       };
+
       return {
         keydown: (event: KeyboardEvent) => {
           if (!isNeedToUse) return;
           if (Object.values(keys).some((key) => !!key)) return;
-          if ([forwardAction.key, backwardAction.key].includes(event.key)){
-            throttledHandler(event, keys)
+          if ([forwardAction.key, backwardAction.key].includes(event.key)) {
+            throttledHandler(event, keys);
           }
         },
         keyup: (event: KeyboardEvent) => {
@@ -63,7 +83,7 @@ const useInputSlider = (
       window.removeEventListener("keydown", listner.keydown);
       window.removeEventListener("keyup", listner.keyup);
     };
-  }, [isNeedToUse, forwardAction, backwardAction]);
+  }, [isNeedToUse, forwardAction, backwardAction, throttledHandler]);
 };
 
 export default useInputSlider;

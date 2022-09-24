@@ -2,7 +2,6 @@
   "name": "movie-app",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://XantreGodlike.gihub.io/movie-app",
   "dependencies": {
     "@emotion/react": "^11.9.0",
     "@emotion/styled": "^11.8.1",
@@ -28,11 +27,11 @@
     "react-router-dom": "^6.2.1",
     "react-scripts": "^5.0.1",
     "react-swipeable": "^7.0.0",
-    "react-transition-group": "^4.4.2",
     "react-youtube": "^7.14.0",
     "sass": "^1.49.0",
     "styled-components": "^5.3.5",
     "typescript": "^4.6.3",
+    "use-common-hook": "^1.0.5",
     "use-debounce": "^8.0.1"
   },
   "scripts": {
@@ -44,8 +43,17 @@
     "predeploy": "yarn build"
   },
   "eslintConfig": {
-    "extends": "react-app"
+    "extends": "react-app",
+    "rules": {
+      "react-hooks/exhaustive-deps": "error",
+      "simple-import-sort/imports": "error",
+      "simple-import-sort/exports": "error"
+    },
+    "plugins": [
+      "simple-import-sort"
+    ]
   },
+  "homepage": "/movie-app",
   "browserslist": {
     "production": [
       ">0.2%",
@@ -60,6 +68,7 @@
   },
   "devDependencies": {
     "@types/lodash-es": "^4.17.6",
+    "eslint-plugin-simple-import-sort": "^8.0.0",
     "gh-pages": "^4.0.0",
     "react-app-rewired": "^2.2.1"
   }

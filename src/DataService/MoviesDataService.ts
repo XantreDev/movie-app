@@ -1,5 +1,6 @@
 import axios from "axios";
 import dayjs from "dayjs";
+
 import { LoadedMovie } from "../types/movie";
 import { MovieDetailsRest } from "../types/movieDetails";
 import { MovieSearchData, MoviesSearchResultTransformed } from "../types/movieSearchResults";

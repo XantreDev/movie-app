@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { indexesRefContext } from './../contexts/MoviesDataProvider';
 import { useContext } from 'react';
+
+import { indexesRefContext } from './../contexts/MoviesDataProvider';
 
 const useRowIndex = () => {
   const indexesRef = useContext(indexesRefContext)

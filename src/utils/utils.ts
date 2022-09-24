@@ -1,5 +1,6 @@
-import { Paths } from './../constants/paths';
 import { NavigateFunction } from 'react-router-dom';
+
+import { Paths } from './../constants/paths';
 export const generateBaseRequest = (baseUrl: string, apiKey: string) => ({
     "baseURL": baseUrl,
     headers: {

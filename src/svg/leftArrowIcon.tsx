@@ -1,4 +1,5 @@
 import React from "react";
+
 import { IconProps } from "./../types/props";
 
 const leftArrowIcon = (props: IconProps)  => {

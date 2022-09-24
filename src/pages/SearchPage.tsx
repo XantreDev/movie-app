@@ -1,15 +1,16 @@
 import { Skeleton } from "@mui/material";
 import { motion } from "framer-motion";
 import React, { useContext, useEffect, useLayoutEffect, useMemo, useState } from "react";
+import { Helmet } from 'react-helmet-async';
 import { useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
+import { useDebounce } from "use-debounce";
+
 import { Styles } from "../contexts/StyleProvider";
 import { MoviesDataService } from "../DataService/MoviesDataService";
 import starIcon from "../svg/starIcon";
 import { MoviesSearchRequest, MoviesSearchResult, MoviesSearchResultTransformed, RequestStatus } from "../types/movieSearchResults";
 import { getFormattedRating, redirectToMovie } from "../utils/utils";
-import { Helmet } from 'react-helmet-async';
-import { useDebounce } from "use-debounce";
 
 export type SearchPageProps = {
   data: MoviesSearchRequest

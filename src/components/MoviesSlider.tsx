@@ -1,21 +1,21 @@
 import dayjs from "dayjs";
 import { motion } from "framer-motion";
-import React, { useCallback, useContext, useEffect, useRef } from "react";
+import { noop } from "lodash-es";
+import React, { useCallback, useContext, useEffect } from "react";
+import { useSwipeable } from "react-swipeable";
 import styled from "styled-components";
+
 import { moviesDataContextDispatch } from "../contexts/MoviesDataProvider";
-import { Styles } from "../contexts/StyleProvider";
 import { MoviesDataService } from "../DataService/MoviesDataService";
 import useInputSlider from "../hooks/useInputSlider";
+import useRowLastPage from "../hooks/useRowLastPage";
 import { CardPosition } from "../pages/MainPage";
 import { MoviesDataLoaded } from "../types/context";
 import { Movie } from "../types/movie";
+import { Keys } from "./../constants/keys";
 import MovieCard from "./MovieCard";
-import { Keys } from "./../constants/keys"
 import { notificationContext } from "./NotificationsProvider";
 import useCentralIndex from "./useCentralIndex";
-import useRowLastPage from "../hooks/useRowLastPage";
-import { useSwipeable } from "react-swipeable";
-import { noop } from "lodash-es";
 
 const ContentRoot = styled(motion.div)`
   position: absolute;
@@ -26,7 +26,11 @@ const ContentRoot = styled(motion.div)`
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding-top: ${({ theme: { dimmensions: {searchHeight, searchTopOffset} } }) => searchHeight + searchTopOffset}px;
+  padding-top: ${({
+    theme: {
+      dimmensions: { searchHeight, searchTopOffset },
+    },
+  }) => searchHeight + searchTopOffset}px;
   overflow: hidden;
   pointer-events: none;
 `;
@@ -40,15 +44,15 @@ const ContentGenreTitle = styled(motion.h2)`
   ${ContainerStyle}
 
   user-select: none;
-  font-size: clamp(2rem, 8vw, 5.6rem); 
+  font-size: clamp(2rem, 8vw, 5.6rem);
   font-weight: 600;
   line-height: calc(clamp(2rem, 8vw, 5.6rem) * 1.2);
 
   @media screen and (max-width: 500px) {
     transform: translateX(-15%);
-  }  
+  }
 
-  color: ${({ theme: { colors }}) => colors.accent};
+  color: ${({ theme: { colors } }) => colors.accent};
 `;
 
 const CardsContainer = styled(motion.main)`
@@ -58,7 +62,6 @@ const CardsContainer = styled(motion.main)`
   position: relative;
 
   margin-top: 32px;
-  /* overflow: hidden; */
 `;
 
 export type HorizontalPosition = "top" | "center" | "bottom";
@@ -66,14 +69,16 @@ export type HorizontalPosition = "top" | "center" | "bottom";
 type MoviesSliderProps = {
   data: MoviesDataLoaded["data"][0];
   position: HorizontalPosition;
-}
+};
 
 const MoviesSlider = ({ data, position }: MoviesSliderProps) => {
   const { movies: moviesData, genre } = data;
 
   const offset = 5;
   const oneBunchLoad = 20;
-  const { centralIndex, decriment, increment, unsafeChange } = useCentralIndex(genre.id)
+  const { centralIndex, decriment, increment, unsafeChange } = useCentralIndex(
+    genre.id
+  );
 
   const dispatch = useContext(moviesDataContextDispatch);
 
@@ -90,18 +95,18 @@ const MoviesSlider = ({ data, position }: MoviesSliderProps) => {
   }, [moviesData, centralIndex]);
 
   const { ref } = useSwipeable({
-    onSwipedLeft: position === 'center' ? increment : noop,
-    onSwipedRight: position === 'center' ? decriment : noop,
-    trackMouse: false
-  })
+    onSwipedLeft: position === "center" ? increment : noop,
+    onSwipedRight: position === "center" ? decriment : noop,
+    trackMouse: false,
+  });
 
   useEffect(() => {
-    ref(document as unknown as HTMLElement)
-  })
+    ref(document as unknown as HTMLElement);
+  });
 
-  const [getTargetPage, incrementTargetPage] = useRowLastPage(genre.id)
+  const [getTargetPage, incrementTargetPage] = useRowLastPage(genre.id);
 
-  const notificationDispatch = useContext(notificationContext)
+  const notificationDispatch = useContext(notificationContext);
 
   useEffect(() => {
     const whereLoad = whereNeedToLoadData();
@@ -111,7 +116,7 @@ const MoviesSlider = ({ data, position }: MoviesSliderProps) => {
     const currentTime = dayjs();
     (async () => {
       const localTargetPage = getTargetPage();
-      incrementTargetPage()
+      incrementTargetPage();
       try {
         const movies = await MoviesDataService.getMoviesDiscoverPage(
           localTargetPage,
@@ -124,19 +129,19 @@ const MoviesSlider = ({ data, position }: MoviesSliderProps) => {
             loadStarted: currentTime,
             movies: movies.map((movieData) => ({
               ...movieData,
-              key: `${movieData.id}-${genre.id}`
-            }))
+              key: `${movieData.id}-${genre.id}`,
+            })),
           },
         });
       } catch {
         notificationDispatch({
-          type: 'append-notification',
+          type: "append-notification",
           payload: {
             duration: 5,
             id: +dayjs(),
-            text: "Some feed movies loaded with error"
-          }
-        })
+            text: "Some feed movies loaded with error",
+          },
+        });
         dispatch({
           type: "set-loaded-movies",
           payload: {
@@ -147,22 +152,19 @@ const MoviesSlider = ({ data, position }: MoviesSliderProps) => {
               isLoading: false,
               id: currentTime.toISOString() + genre.id + index,
               loadStarted: currentTime,
-              key: currentTime.toISOString() + genre.id + index
+              key: currentTime.toISOString() + genre.id + index,
             })),
           },
         });
       }
     })();
 
-    const tmp: Movie[] = Array.from(Array(oneBunchLoad)).map(
-      (__, index) =>
-        ({
-          isLoading: true,
-          id: currentTime.toISOString() + genre.id + index,
-          loadStarted: currentTime,
-          key: currentTime.toISOString() + genre.id + index
-        })
-    );
+    const tmp: Movie[] = Array.from(Array(oneBunchLoad)).map((__, index) => ({
+      isLoading: true,
+      id: currentTime.toISOString() + genre.id + index,
+      loadStarted: currentTime,
+      key: currentTime.toISOString() + genre.id + index,
+    }));
 
     dispatch({
       type: "add-movies-at-row",
@@ -172,8 +174,8 @@ const MoviesSlider = ({ data, position }: MoviesSliderProps) => {
         movies: tmp,
       },
     });
-    if (whereLoad === 'left') {
-      unsafeChange(oneBunchLoad)
+    if (whereLoad === "left") {
+      unsafeChange(oneBunchLoad);
     }
 
     // if (whereLoad === "left") {
@@ -183,6 +185,7 @@ const MoviesSlider = ({ data, position }: MoviesSliderProps) => {
     // if (whereLoad === "right") {
     //   setMoviesData((prev) => [...prev, ...tmp]);
     // }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [centralIndex]);
 
   const getPosition = (index): CardPosition => {
@@ -211,7 +214,7 @@ const MoviesSlider = ({ data, position }: MoviesSliderProps) => {
       key: Keys.ArrowLeft,
       callback: decriment,
     },
-    position === 'center'
+    position === "center"
   );
   return (
     <ContentRoot
@@ -242,9 +245,9 @@ const MoviesSlider = ({ data, position }: MoviesSliderProps) => {
         velocity: 1.8,
       }}
     >
-      <ContentGenreTitle >{genre.name}:</ContentGenreTitle>
+      <ContentGenreTitle>{genre.name}:</ContentGenreTitle>
 
-      <CardsContainer >
+      <CardsContainer>
         {moviesData.map((movieData, index) => (
           <MovieCard
             position={getPosition(index)}
@@ -252,7 +255,7 @@ const MoviesSlider = ({ data, position }: MoviesSliderProps) => {
             onClick={() => {
               if (index === centralIndex) return;
 
-              index < centralIndex ? decriment() : increment()
+              index < centralIndex ? decriment() : increment();
             }}
             key={movieData.key}
           />

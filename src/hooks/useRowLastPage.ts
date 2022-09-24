@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import { useContext } from 'react';
 import React from 'react'
+
 import { indexesRefContext } from '../contexts/MoviesDataProvider';
 
 const useRowLastPage = (genreId: number) => {

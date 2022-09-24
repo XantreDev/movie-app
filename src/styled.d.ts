@@ -1,5 +1,6 @@
-import { Styles } from './contexts/StyleProvider';
 import 'styled-components'
+
+import { Styles } from './contexts/StyleProvider';
 
 type StylesType = typeof Styles
 

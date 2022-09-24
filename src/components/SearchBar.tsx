@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+
 import { Paths } from '../constants/paths';
 import searchIcon from '../svg/searchIcon';
 

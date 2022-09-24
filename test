@@ -1,4 +1,0 @@
-GET /3/search/movie?query=%D0%9C%D1%83%D0%B2%D0%B8%2043 HTTP/1.1
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJjYTFkYzVkNjU0M2E5YzgzM2IxNDNhODc5MGVlOTk5NSIsInN1YiI6IjYxZjJlODA2OWEzYzQ5MDA0NDY5NDU4NCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.ZFB-6d11GjxbaPcH9IsJiTHo4e2IxxNspyF0MmDYpJU
-Host: api.themoviedb.org
-Accept: */*

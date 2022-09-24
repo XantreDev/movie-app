@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react'
 import styled from 'styled-components'
+
 import useBlockScrolling from '../hooks/useBlockScrolling'
 import { ModalContainerProps } from '../types/props'
 

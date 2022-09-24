@@ -1,13 +1,11 @@
-import { MoviesDataLoaded } from "./../types/context";
-import { useCallback, useLayoutEffect, useMemo, useRef } from "react";
-import { useEffect } from "react";
+/* eslint-disable react-hooks/exhaustive-deps */
+import { useCallback, useContext, useEffect, useMemo, useState } from "react";
+
 import {
   indexesRefContext,
-  moviesDataContext,
+  moviesDataContext
 } from "./../contexts/MoviesDataProvider";
-import { useContext } from "react";
-import { useState } from "react";
-import React from "react";
+import { MoviesDataLoaded } from "./../types/context";
 
 const useCentralIndex = (genreId: number) => {
   const { data } = useContext(moviesDataContext) as MoviesDataLoaded;
@@ -40,13 +38,19 @@ const useCentralIndex = (genreId: number) => {
     );
   }, [setCentralIndex, currentData]);
 
-  const unsafeChange = useCallback((offset) => {
-    setCentralIndex(index => index + offset)
-  }, [setCentralIndex])
+  const unsafeChange = useCallback(
+    (offset) => {
+      setCentralIndex((index) => index + offset);
+    },
+    [setCentralIndex]
+  );
 
   return {
-    centralIndex, increment, decriment, unsafeChange
-  }
+    centralIndex,
+    increment,
+    decriment,
+    unsafeChange,
+  };
 };
 
 export default useCentralIndex;

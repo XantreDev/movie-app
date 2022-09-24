@@ -1,5 +1,6 @@
 import React from 'react'
 import { HelmetProvider } from 'react-helmet-async'
+
 import MoviesDataProvider from '../contexts/MoviesDataProvider'
 import StyleProvider from '../contexts/StyleProvider'
 import ModalProvider from './ModalProvider'

@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import produce from "immer";
 import React, { createContext, useReducer } from "react";
 import { createPortal } from "react-dom";
+
 import { ModalActions, ModalState } from "../types/context";
 
 const initialModalState = {

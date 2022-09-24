@@ -1,8 +1,9 @@
-import React, { useReducer } from 'react'
-import { createPortal } from 'react-dom'
 import { produce } from 'immer'
-import { NotificationActions, NotificationState } from '../types/context'
+import React, { useReducer } from 'react'
 import { createContext } from 'react'
+import { createPortal } from 'react-dom'
+
+import { NotificationActions, NotificationState } from '../types/context'
 import NotificationsList from './NotificationsList'
 
 

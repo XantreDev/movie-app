@@ -1,9 +1,10 @@
-import { motion, AnimatePresence } from 'framer-motion'
+import { AnimatePresence,motion } from 'framer-motion'
 import React from 'react'
 import { useRef } from 'react'
 import { useEffect } from 'react'
 import { useContext } from 'react'
 import styled from 'styled-components'
+
 import { NotificationListProps } from '../types/props'
 import { notificationContext } from './NotificationsProvider'
 

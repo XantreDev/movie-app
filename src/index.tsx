@@ -1,17 +1,19 @@
+import "./index.scss";
+
 import React from "react";
 import { createRoot } from "react-dom/client";
-import "./index.scss";
+import { BrowserRouter } from "react-router-dom";
+
 import App from "./App";
 import * as serviceWorker from "./serviceWorker";
-import { HashRouter } from "react-router-dom";
 
 const root = createRoot(document.querySelector("#root"));
 
 root.render(
   <React.StrictMode>
-    <HashRouter>
+    <BrowserRouter basename="/movie-app">
       <App />
-    </HashRouter>
+    </BrowserRouter>
   </React.StrictMode>
 );
 
