@@ -40,7 +40,7 @@
     "test": "react-app-rewired test",
     "eject": "react-app-rewired eject",
     "deploy": "gh-pages -d build",
-    "predeploy": "yarn build"
+    "predeploy": "na build"
   },
   "eslintConfig": {
     "extends": "react-app",
