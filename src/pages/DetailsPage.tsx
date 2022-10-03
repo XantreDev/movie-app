@@ -76,7 +76,7 @@ const DetailsFlexColumns = styled.div`
   }
 `;
 
-const Poster = styled(motion.div)<{ imageUrl: string }>`
+const Poster = styled(motion.div)<{ imageUrl: string | null }>`
   user-select: none;
   height: 660px;
   width: 528px;
@@ -86,12 +86,12 @@ const Poster = styled(motion.div)<{ imageUrl: string }>`
   @media screen and (max-width: 900px) {
     width: 100%;
   }
+  position: relative;
 
   background-image: url(${({ imageUrl }) => imageUrl});
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
-  position: relative;
 `;
 
 const Rating = styled.div`
@@ -237,12 +237,21 @@ const QuoteIcon = styled(quoteIcon)`
 const ReviewCards = styled.div`
   display: flex;
   width: 100%;
-  flex-wrap: wrap;
   justify-content: space-between;
   gap: 40px 20px;
 
-  & > * {
-    flex: 1 1 calc(calc(800px - 100%) * 99999);
+  @media screen and (min-width: 800px) {
+    & > * {
+      flex: 1 1 33%;
+      max-width: 50%;
+      min-width: 0;
+    }
+  }
+  @media screen and (max-width: 800px) {
+    flex-wrap: wrap;
+    & > * {
+      flex: 1 1 100%;
+    }
   }
 `;
 
@@ -259,9 +268,7 @@ const ReviewCard = styled.article<{ rating?: number }>`
   display: flex;
   flex-direction: column;
   gap: 10px;
-  @media screen and (min-width: 800px) {
-    max-width: 50%;
-  }
+
   height: 200px;
   position: relative;
 `;
@@ -431,9 +438,9 @@ const DetailsPage = () => {
               <DetailsFlexRows>
                 <DetailsFlexColumns>
                   <Poster
-                    initial={{ opacity: 0 }}
+                    initial={{ opacity: 0, backgroundColor: "gray" }}
                     variants={{
-                      isNotLoaded: { opacity: 0 },
+                      isNotLoaded: { opacity: 0, backgroundColor: "gray" },
                       isLoaded: { opacity: 1 },
                     }}
                     animate={isPosterLoaded ? "isLoaded" : "isNotLoaded"}
@@ -461,24 +468,26 @@ const DetailsPage = () => {
                       </Generes>
                     </AdditionalInfo>
                     <Overview>{details.data.overview}</Overview>
-                    <Images>
-                      Images
-                      <ImagesContainer>
-                        {details.data.images.backdrops
-                          .slice(0, 3)
-                          .map((image) => (
-                            <Zoom
-                              overlayBgColorEnd="rgba(255 255 255 / .5)"
-                              zoomMargin={40}
-                              key={image.file_path}
-                            >
-                              <ImageRect
-                                src={getImageUrl(image.file_path, "original")}
-                              />
-                            </Zoom>
-                          ))}
-                      </ImagesContainer>
-                    </Images>
+                    {!!details.data.images.backdrops.length && (
+                      <Images>
+                        Images
+                        <ImagesContainer>
+                          {details.data.images.backdrops
+                            .slice(0, 3)
+                            .map((image) => (
+                              <Zoom
+                                overlayBgColorEnd="rgba(255 255 255 / .5)"
+                                zoomMargin={40}
+                                key={image.file_path}
+                              >
+                                <ImageRect
+                                  src={getImageUrl(image.file_path, "original")}
+                                />
+                              </Zoom>
+                            ))}
+                        </ImagesContainer>
+                      </Images>
+                    )}
                     <ActorsList data={details.data} />
                   </Details>
                 </DetailsFlexColumns>

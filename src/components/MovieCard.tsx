@@ -9,7 +9,7 @@ import { CardPosition } from "../pages/MainPage";
 import starIcon from "../svg/starIcon";
 import stopwatchIcon from "../svg/stopwatchIcon";
 import { LoadedMovie, Movie } from "../types/movie";
-import { getFormattedRating, redirectToMovie } from "../utils/utils";
+import { getDetailsMovieUrl, getFormattedRating } from "../utils/utils";
 
 const Card = styled(motion.article)`
   z-index: 1;
@@ -195,7 +195,10 @@ const MovieCard = ({ position, movieData, onClick }: MovieCardProps) => {
   const handleClick = useCombineCallbacksByState(
     [
       {
-        callback: () => redirectToMovie(navigate, movieData.id),
+        callback: () => {
+          console.log(getDetailsMovieUrl(movieData.id));
+          navigate(getDetailsMovieUrl(movieData.id));
+        },
         target: "center",
         isNeedToUse: !isLoading && !isFailed,
       },

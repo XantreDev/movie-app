@@ -1,11 +1,12 @@
 import { AnimatePresence } from "framer-motion";
-import React, { useMemo } from "react";
-import { Navigate, Route, Routes, useLocation } from "react-router-dom";
+import React from "react";
+import { Navigate, Route, Routes } from "react-router-dom";
 import styled, { createGlobalStyle } from "styled-components";
 
 import AllProviders from "./components/AllProviders";
 import SearchBar from "./components/SearchBar";
-import { Paths } from "./constants/paths";
+import { Pages, PATHS } from "./constants/paths";
+import { usePage } from "./hooks/usePath";
 import DetailsPage from "./pages/DetailsPage";
 import MainPage from "./pages/MainPage";
 import SearchPage from "./pages/SearchPage";
@@ -26,12 +27,12 @@ import SearchPage from "./pages/SearchPage";
 //   transition: 100ms ease-out;
 // `;
 
-const RootDiv = styled.div<{ path: Paths }>`
+const RootDiv = styled.div<{ path: Pages }>`
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0.2);
   width: 100vw;
   background: ${(props) => props.theme.colors.background};
   ${({ path }) => {
-    if (path === Paths.Main) {
+    if (path === Pages.Main) {
       return "height: 100vh;";
     }
     return "min-height: 100vh; background: #000;";
@@ -39,52 +40,32 @@ const RootDiv = styled.div<{ path: Paths }>`
   transition: background 100ms;
 `;
 
-const BodyStyle = createGlobalStyle<{ path: Paths }>`
+const BodyStyle = createGlobalStyle<{ path: Pages }>`
   body {
     overflow-x: hidden;
-    overflow-y:${({ path }) => (path === Paths.Main ? "hidden" : "scroll")};
+    overflow-y:${({ path }) => (path === Pages.Main ? "hidden" : "scroll")};
   }
 `;
 
 function App() {
-  const { pathname } = useLocation();
-
-  const locationPath = useMemo(() => {
-    if (pathname.includes(Paths.Details)) return Paths.Details;
-    if (pathname.includes(Paths.Search)) return Paths.Search;
-    return Paths.Main;
-  }, [pathname]);
+  const page = usePage();
 
   return (
     <AllProviders>
       <div className="App">
-        <RootDiv path={locationPath}>
-          <BodyStyle path={locationPath} />
+        <RootDiv path={page}>
+          <BodyStyle path={page} />
           <SearchBar />
           <AnimatePresence exitBeforeEnter>
-            <Routes key={locationPath}>
-              <Route
-                key="main-route"
-                path={`/${Paths.Main}`}
-                element={<MainPage />}
-              />
-              <Route
-                key="search-route"
-                path={`/${Paths.Search}/:searchQuery`}
-                element={<SearchPage />}
-              />
-              <Route
-                key="film-details-route"
-                path={`/${Paths.Details}/:movieId`}
-                element={<DetailsPage />}
-              />
-              <Route path={"*"} element={<Navigate to={`/${Paths.Main}`} />} />
+            <Routes key={page}>
+              <Route path={PATHS.MAIN} element={<MainPage />} />
+              <Route path={PATHS.SEARCH} element={<SearchPage />} />
+              <Route path={PATHS.DETAILS} element={<DetailsPage />} />
+              <Route path={"*"} element={<Navigate to={PATHS.MAIN} />} />
             </Routes>
           </AnimatePresence>
         </RootDiv>
       </div>
-      {/* <div id="cursor" ref={cursorRef}></div> */}
-      {/* <Cursor ref={cursorRef}></Cursor> */}
     </AllProviders>
   );
 }

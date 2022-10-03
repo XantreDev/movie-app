@@ -1,17 +1,25 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import { useLayoutEffect, useState } from "react";
 
-const useLazyBackgroundImage = (src: string) => {
-  const [source, setSource] = useState<string | null>(null)
+const useLazyBackgroundImage = (src: string | null) => {
+  const [source, setSource] = useState<string | null>(null);
 
-  useEffect(() => {
-    setSource(null)
-    const image = new Image()
-    image.src = src
-    image.onload = () => setSource(src)
-  }, [src])
+  useLayoutEffect(() => {
+    setSource(null);
 
-  const isLoaded = useMemo(() => source === null ? false : true, [src, source])
-  return [isLoaded, source] as [boolean, string | null]
-}
+    if (!src) return;
 
-export default useLazyBackgroundImage
+    const image = new Image();
+    image.src = src;
+    const abortController = new AbortController();
+    image.addEventListener("load", () => setSource(src), {
+      signal: abortController.signal,
+    });
+
+    return () => abortController.abort();
+  }, [src]);
+
+  const isLoaded = !!source;
+  return [isLoaded, source] as [boolean, string | null];
+};
+
+export default useLazyBackgroundImage;

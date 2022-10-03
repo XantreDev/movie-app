@@ -1,25 +1,28 @@
 import { Skeleton } from "@mui/material";
 import { motion } from "framer-motion";
-import React, { useContext, useEffect, useLayoutEffect, useMemo, useState } from "react";
-import { Helmet } from 'react-helmet-async';
+import React, { useEffect, useMemo, useState } from "react";
+import { Helmet } from "react-helmet-async";
 import { useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
 import { useDebounce } from "use-debounce";
 
-import { Styles } from "../contexts/StyleProvider";
 import { MoviesDataService } from "../DataService/MoviesDataService";
 import starIcon from "../svg/starIcon";
-import { MoviesSearchRequest, MoviesSearchResult, MoviesSearchResultTransformed, RequestStatus } from "../types/movieSearchResults";
-import { getFormattedRating, redirectToMovie } from "../utils/utils";
+import {
+  CardData,
+  MoviesSearchRequest,
+  RequestStatus
+} from "../types/movieSearchResults";
+import { getDetailsMovieUrl, getFormattedRating } from "../utils/utils";
 
 export type SearchPageProps = {
-  data: MoviesSearchRequest
-}
+  data: MoviesSearchRequest;
+};
 
 const SearchCard = styled(motion.div)`
   width: 240px;
   height: 320px;
-  background-color: ${({ theme: { colors }}) => colors.tint};
+  background-color: ${({ theme: { colors } }) => colors.tint};
   position: relative;
 
   border-radius: ${({ theme }) => theme.borderRadiuses.default};
@@ -28,16 +31,16 @@ const SearchCard = styled(motion.div)`
   flex-direction: column-reverse;
   overflow: hidden;
   cursor: pointer;
-`
+`;
 
 const SearchCardBadgeWrapper = styled.div`
   height: 100%;
   position: relative;
 
   backdrop-filter: blur(4px);
-  border-radius: ${({ theme: { borderRadiuses }}) => borderRadiuses.cardBadge};
+  border-radius: ${({ theme: { borderRadiuses } }) => borderRadiuses.cardBadge};
 
-  background-color: rgba(0 0 0 / .3);
+  background-color: rgba(0 0 0 / 0.3);
   transition: transform 200ms ease-in-out;
   transform: translateY(calc(100% - 50px));
   *:hover > & {
@@ -45,7 +48,7 @@ const SearchCardBadgeWrapper = styled.div`
   }
 
   &::after {
-    content: 'Learn more...';
+    content: "Learn more...";
     position: absolute;
     top: 50%;
     left: 50%;
@@ -56,34 +59,36 @@ const SearchCardBadgeWrapper = styled.div`
     color: white;
     font-weight: 500;
   }
-`
+`;
 
 const SearchCardBadge = styled.div`
   display: flex;
-  background-color: rgba(0 0 0 / .3);
-  border-radius: ${({ theme: { borderRadiuses }}) => borderRadiuses.cardBadge};
+  background-color: rgba(0 0 0 / 0.3);
+  border-radius: ${({ theme: { borderRadiuses } }) => borderRadiuses.cardBadge};
   padding: 10px;
   gap: 15px;
   align-items: center;
   height: 50px;
   width: 100%;
-`
+`;
 
 const SearchContainer = styled(motion.div)`
- position: relative;
- padding-top: ${({theme: {
-    dimmensions: {
-      searchHeight,
-      searchTopOffset,
-      searchCardsOffsetFromSearchBar,
-    }},
+  position: relative;
+  padding-top: ${({
+    theme: {
+      dimmensions: {
+        searchHeight,
+        searchTopOffset,
+        searchCardsOffsetFromSearchBar,
+      },
+    },
   }) => searchHeight + searchTopOffset + searchCardsOffsetFromSearchBar}px;
   padding-bottom: 40px;
-  
+
   margin: 0 auto;
   width: 80vw;
   display: grid;
-  
+
   grid-template-columns: repeat(auto-fill, min(240px, 70vw));
   gap: 50px 40px;
   align-items: center;
@@ -109,7 +114,7 @@ const CardBackground = styled.div`
 
   background-position: center;
   background-size: cover;
-`
+`;
 
 const CardTitle = styled.div`
   width: 140px;
@@ -121,19 +126,19 @@ const CardTitle = styled.div`
   font-weight: 400;
   line-height: 19px;
   white-space: nowrap;
-`
+`;
 
 const CardBadgeDivider = styled.span`
   height: 100%;
   width: 1px;
   background-color: rgba(255, 255, 255, 0.8);
   filter: blur(0.3px);
-`
+`;
 
 const StarIcon = styled(starIcon)`
   width: 10px;
   height: 10px;
-`
+`;
 
 const RatingSection = styled.span`
   font-size: 14px;
@@ -144,51 +149,59 @@ const RatingSection = styled.span`
   display: inline-flex;
   gap: 3px;
   align-items: center;
-`
+`;
 
 const SearchPage = () => {
-  const { searchQuery : searchRequestNotDebounced } = useParams()
-  const [ searchRequest ] = useDebounce(searchRequestNotDebounced, 300) 
-  const [searchResults, setSearchResults] = useState<MoviesSearchRequest>({ status: RequestStatus.Loading })
-
+  const { searchQuery: searchRequestNotDebounced } = useParams();
+  const [searchRequest] = useDebounce(searchRequestNotDebounced, 300);
+  const [searchResults, setSearchResults] = useState<MoviesSearchRequest>({
+    status: RequestStatus.Loading,
+  });
 
   useEffect(() => {
-    const currentRequest = searchRequest;
-    if (!searchRequest.length){
-      return
+    if (!searchRequest.length) {
+      return;
     }
+
+    setSearchResults({ status: RequestStatus.Loading });
+
+    const isNeedToSearchController = new AbortController();
 
     (async () => {
       try {
-        setSearchResults({status: RequestStatus.Loading})
-        const result = await MoviesDataService.findMovieByQuery(searchRequest)
-        if (searchRequest !== currentRequest) {
-          return;
-        }
+        const result = await MoviesDataService.findMovieByQuery(
+          searchRequest,
+          isNeedToSearchController.signal
+        );
+
+        if (isNeedToSearchController.signal.aborted) return;
+
         setSearchResults({
           data: result,
-          status: RequestStatus.Finished
-        })
+          status: RequestStatus.Finished,
+        });
       } catch {
         setSearchResults({
-          status: RequestStatus.Error
-        })
+          status: RequestStatus.Error,
+        });
       }
-    })()
-  }, [searchRequest])
+    })();
 
-  const data = searchResults
+    return () => isNeedToSearchController.abort();
+  }, [searchRequest]);
 
-  const cards = useMemo<MoviesSearchResultTransformed[]>(() => {
-    if (data.status !== RequestStatus.Finished){
-      return Array(10).fill({} as MoviesSearchResultTransformed)
+  const data = searchResults;
+
+  const cards = useMemo<CardData[]>(() => {
+    if (data.status !== RequestStatus.Finished) {
+      return Array(10).fill({ isLoading: true } as CardData);
     }
-    return data.data
-  }, [data])
+    return data.data;
+  }, [data]);
 
-  const isNeedToShowLoader = data.status !== RequestStatus.Finished
-
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const redirectToMovie = (id: number | string) =>
+    navigate(getDetailsMovieUrl(id));
 
   return (
     <>
@@ -196,7 +209,6 @@ const SearchPage = () => {
         <title>{searchRequest}</title>
       </Helmet>
       <SearchContainer
-        
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -208,18 +220,15 @@ const SearchPage = () => {
         {cards.map((cardData, index) => (
           <SearchCard
             onClick={() =>
-              data.status === RequestStatus.Finished
-                ? redirectToMovie(navigate, cardData.id)
-                : null
+              cardData.isLoading ? null : redirectToMovie(cardData.id)
             }
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0, transition: { duration: 0.1 } }}
             transition={{ type: "tween" }}
-            
             key={index}
           >
-            {isNeedToShowLoader ? (
+            {cardData.isLoading ? (
               <Skeleton
                 sx={{
                   position: "absolute",
@@ -241,9 +250,9 @@ const SearchPage = () => {
               ></CardBackground>
             )}
 
-            <SearchCardBadgeWrapper >
-              <SearchCardBadge >
-                {isNeedToShowLoader ? (
+            <SearchCardBadgeWrapper>
+              <SearchCardBadge>
+                {cardData.isLoading ? (
                   <Skeleton
                     sx={{ width: "100%", bgcolor: "grey.800" }}
                     variant="text"

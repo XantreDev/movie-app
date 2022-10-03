@@ -147,54 +147,56 @@ const ActorsList = ({ data }: ActorsListProps) => {
   );
 
   return (
-    <Actors>
-      <div style={{ marginLeft: "20px" }}>Actors</div>
-      <ActorsContainer>
-        <LeftArrow
-          onClick={() =>
-            setLeftElement((value) => (value > 0 ? value - 1 : value))
-          }
-        />
-        <ActorsCardsContainer>
-          {cast.map((value, index) => (
-            <ActorCard
-              key={value.id}
-              // initial={false}
-              animate={getPlace(index).toString()}
-              variants={variation}
-            >
-              <a
-                style={{
-                  display: "contents",
-                  color: "inherit",
-                }}
-                href={getGoogleUrl(value.name)}
-                rel="noreferrer"
-                target="_blank"
+    !!cast?.length && (
+      <Actors>
+        <div style={{ marginLeft: "20px" }}>Actors</div>
+        <ActorsContainer>
+          <LeftArrow
+            onClick={() =>
+              setLeftElement((value) => (value > 0 ? value - 1 : value))
+            }
+          />
+          <ActorsCardsContainer>
+            {cast.map((value, index) => (
+              <ActorCard
+                key={value.id}
+                // initial={false}
+                animate={getPlace(index).toString()}
+                variants={variation}
               >
-                <ActorCardImage
-                  onError={(ev) => {
-                    (ev.target as HTMLImageElement)?.setAttribute?.(
-                      "data-error",
-                      "true"
-                    );
+                <a
+                  style={{
+                    display: "contents",
+                    color: "inherit",
                   }}
-                  src={getImageUrl(value.profile_path, "medium")}
-                />
-                <ActorCardName>{value.name}</ActorCardName>
-              </a>
-            </ActorCard>
-          ))}
-        </ActorsCardsContainer>
-        <RightArrow
-          onClick={() =>
-            setLeftElement((value) =>
-              value + 4 < cast.length ? value + 1 : value
-            )
-          }
-        />
-      </ActorsContainer>
-    </Actors>
+                  href={getGoogleUrl(value.name)}
+                  rel="noreferrer"
+                  target="_blank"
+                >
+                  <ActorCardImage
+                    onError={(ev) => {
+                      (ev.target as HTMLImageElement)?.setAttribute?.(
+                        "data-error",
+                        "true"
+                      );
+                    }}
+                    src={getImageUrl(value.profile_path, "medium")}
+                  />
+                  <ActorCardName>{value.name}</ActorCardName>
+                </a>
+              </ActorCard>
+            ))}
+          </ActorsCardsContainer>
+          <RightArrow
+            onClick={() =>
+              setLeftElement((value) =>
+                value + 4 < cast.length ? value + 1 : value
+              )
+            }
+          />
+        </ActorsContainer>
+      </Actors>
+    )
   );
 };
 
