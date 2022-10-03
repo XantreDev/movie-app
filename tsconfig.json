@@ -1,11 +1,12 @@
 {
-    "compilerOptions": {
-        "allowJs": true,
-        "sourceMap": true,
-        "module": "CommonJS",
-        "jsx": "react",
-        "allowSyntheticDefaultImports": true,
-        "target": "ES5",
-        "checkJs": true,
-    }
+  "compilerOptions": {
+    "allowJs": true,
+    "sourceMap": true,
+    "module": "CommonJS",
+    "jsx": "react",
+    "allowSyntheticDefaultImports": true,
+    "target": "ES5",
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "checkJs": true
+  }
 }
