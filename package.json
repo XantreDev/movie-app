@@ -69,7 +69,7 @@
     "@types/lodash-es": "^4.17.6",
     "@types/styled-components": "^5.1.26",
     "eslint-plugin-simple-import-sort": "^8.0.0",
-    "gh-pages": "^4.0.0",
+    "gh-pages": "^5.0.0",
     "react-app-rewired": "^2.2.1"
   }
 }
